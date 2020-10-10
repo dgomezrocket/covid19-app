@@ -1,5 +1,3 @@
-import 'package:covid19/src/models/location.dart';
-import 'package:covid19/src/models/status.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'dart:io';
@@ -10,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/services/auth_service.dart';
 import 'package:covid19/src/utils/config.dart';
+import 'package:covid19/src/models/location.dart';
+import 'package:covid19/src/models/status.dart';
 
 class _ProfileProvider {
   _getPerson(Map personMap) {
@@ -19,8 +19,6 @@ class _ProfileProvider {
     profile.lastname = personMap['lastname'];
     profile.phone = personMap['phone'];
     profile.sex = personMap['sex'];
-    print('GET PERSON: ');
-    print(personMap);
     return profile;
   }
 
@@ -30,9 +28,6 @@ class _ProfileProvider {
       '$baseUrl/persons',
       headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
     );
-
-    print(resp?.body);
-
     return _getPerson(json.decode(resp?.body));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:covid19/src/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/account.dart';
@@ -57,14 +58,34 @@ class _ProfilePageState extends State<ProfilePage> {
     return FutureBuilder(
       future: profileProvider.loadData(),
       initialData: [],
-      builder: (context, AsyncSnapshot<dynamic> snapshot) {
-        _loadData(snapshot.data);
+      builder: (_, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _createCircularProgressIndicator();
+        } else if (snapshot.hasData) {
+          _loadData(snapshot.data);
 
-        return ListView(
-          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-          children: _createElements(),
-        );
+          return ListView(
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            children: _createElements(),
+          );
+        } else {
+          return LoginScreen();
+        }
       },
+    );
+  }
+
+  _createCircularProgressIndicator() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+          ],
+        ),
+      ],
     );
   }
 
