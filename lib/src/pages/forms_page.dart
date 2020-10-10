@@ -73,7 +73,17 @@ class _FormPageState extends State<FormPage> {
           description: 'Descripcion del elemento, esto puede ser largo',
           options: [InputOption(placeHolder: 'Responda aqui...')],
         ),
+        createButtonSave(),
       ],
     );
+  }
+
+  createButtonSave() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      FlatButton(
+        child: Text('Guardar'),
+        onPressed: () {},
+      )
+    ]);
   }
 }

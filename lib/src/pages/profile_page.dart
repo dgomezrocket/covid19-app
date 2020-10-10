@@ -1,10 +1,11 @@
-import 'package:covid19/src/models/location.dart';
-import 'package:covid19/src/models/status.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/account.dart';
 import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/models/role.dart';
+import 'package:covid19/src/models/location.dart';
+import 'package:covid19/src/models/status.dart';
+import 'package:covid19/src/providers/profile_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key}) : super(key: key);
@@ -23,47 +24,90 @@ class _ProfilePageState extends State<ProfilePage> {
           name: '',
           lastname: '',
           phone: '',
-          sex: 'MASCULINO',
+          sex: '',
           location: Location(id: 0, latitude: 0.0, longitude: 0.0),
           status: Status(id: 0, name: '')),
       role: Role(id: 0, name: ''));
 
   List<String> _sexs = ['MASCULINO', 'FENEMINO'];
 
+  // controllers for form text controllers
+  TextEditingController _documentController = new TextEditingController();
+  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _lastnameController = new TextEditingController();
+  TextEditingController _phoneController = new TextEditingController();
+
+  @override
+  void initState() {
+    _documentController.text = '';
+    _nameController.text = '';
+    _lastnameController.text = '';
+    _phoneController.text = '';
+    return super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Inputs de texto'),
-      ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-        children: <Widget>[
-          _crearInput('Número de Documento', 'Documento', setDocument,
-              Icons.accessibility, Icons.person_pin),
-          Divider(),
-          _crearInput('Nombres', 'Nombres', setName, Icons.accessibility,
-              Icons.account_circle),
-          Divider(),
-          _crearInput('Apellidos', 'Apellidos', setLastname,
-              Icons.accessibility, Icons.account_circle),
-          Divider(),
-          _crearInput(
-              'Email', 'Email', setEmail, Icons.alternate_email, Icons.email),
-          Divider(),
-          _crearInput('Teléfono', 'Teléfono', setphone, Icons.share_sharp,
-              Icons.phone_android_outlined),
-          Divider(),
-          _crearDropdown(),
-        ],
-      ),
+      body: _loadProfile(),
     );
   }
 
-  Widget _crearInput(String hintText, String labelText, Function onChange,
-      IconData suffixIcon, IconData iconData) {
+  Widget _loadProfile() {
+    return FutureBuilder(
+      future: profileProvider.loadData(),
+      initialData: [],
+      builder: (context, AsyncSnapshot<dynamic> snapshot) {
+        _loadData(snapshot.data);
+
+        return ListView(
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+          children: _createElements(),
+        );
+      },
+    );
+  }
+
+  T _cast<T>(x) => x is T ? x : null;
+
+  _loadData(dynamic data) {
+    account.person = _cast<Person>(data);
+    _documentController.text = account.person.document;
+    _nameController.text = account.person.name;
+    _lastnameController.text = account.person.lastname;
+    _phoneController.text = account.person.phone;
+  }
+
+  List<Widget> _createElements() {
+    return <Widget>[
+      _createInput('Número de Documento', 'Documento', _documentController,
+          setDocument, Icons.accessibility, Icons.person_pin),
+      Divider(),
+      _createInput('Nombres', 'Nombres', _nameController, setName,
+          Icons.accessibility, Icons.account_circle),
+      Divider(),
+      _createInput('Apellidos', 'Apellidos', _lastnameController, setLastname,
+          Icons.accessibility, Icons.account_circle),
+      Divider(),
+      // _createInput(
+      //     'Email', 'Email', setEmail, Icons.alternate_email, Icons.email),
+      // Divider(),
+      _createInput('Teléfono', 'Teléfono', _phoneController, setphone,
+          Icons.share_sharp, Icons.phone_android_outlined),
+      Divider(),
+      _createDropdown(),
+    ];
+  }
+
+  Widget _createInput(
+      String hintText,
+      String labelText,
+      TextEditingController controller,
+      Function onChange,
+      IconData suffixIcon,
+      IconData iconData) {
     return TextField(
-        // autofocus: true,
+        controller: controller,
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
             hintText: hintText,
@@ -72,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: Icon(iconData)));
   }
 
-  List<DropdownMenuItem<String>> getOpcionesDropdown() {
+  List<DropdownMenuItem<String>> getOptionsDropdown() {
     List<DropdownMenuItem<String>> list = new List();
     _sexs.forEach((sex) {
       list.add(DropdownMenuItem(
@@ -84,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return list;
   }
 
-  Widget _crearDropdown() {
+  Widget _createDropdown() {
     return Row(
       children: <Widget>[
         Icon(Icons.select_all),
@@ -92,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Expanded(
           child: DropdownButton(
             value: account.person.sex,
-            items: getOpcionesDropdown(),
+            items: getOptionsDropdown(),
             onChanged: setSex,
           ),
         )

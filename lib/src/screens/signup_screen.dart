@@ -27,15 +27,14 @@ class SignupScreen extends StatelessWidget {
                   height: 35,
                   child: Helper().errorMessage(formBloc),
                 ),
-                _checkBox(),
                 _buttonField(formBloc),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/forgot_password'),
-                  child: Container(
-                    child: Text('Forgot password?'),
-                    alignment: Alignment.bottomLeft,
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () => Navigator.pushNamed(context, '/forgot_password'),
+                //   child: Container(
+                //     child: Text('Forgot password?'),
+                //     alignment: Alignment.bottomLeft,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -77,18 +76,6 @@ class SignupScreen extends StatelessWidget {
         });
   }
 
-  Widget _checkBox() {
-    return Row(
-      children: <Widget>[
-        Checkbox(
-          onChanged: (checked) => {},
-          value: true,
-        ),
-        Text('keep me logged in'),
-      ],
-    );
-  }
-
   Widget _buttonField(FormBloc bloc) {
     return StreamBuilder<bool>(
         stream: bloc.submitValidForm,
@@ -100,6 +87,7 @@ class SignupScreen extends StatelessWidget {
                 if (snapshot.hasError) {
                   return null;
                 }
+                Navigator.popAndPushNamed(context, '/login');
                 return bloc.register(context);
               },
               child: const Icon(Icons.arrow_forward),

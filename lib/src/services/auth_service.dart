@@ -5,17 +5,18 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter_session/flutter_session.dart';
 
+import 'package:covid19/src/utils/config.dart';
+
 class AuthService {
-  final baseUrl = 'http://localhost:9900';
-  // ignore: non_constant_identifier_names
   static final SESSION = FlutterSession();
 
   Future<dynamic> register(String email, String password) async {
     try {
-      var res = await http.post('$baseUrl/accounts/signup', body: {
-        'email': email,
-        'password': password,
-      });
+      var res = await http.post(
+        '$baseUrl/accounts/signup',
+        body: jsonEncode({'email': email, 'password': password}),
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'},
+      );
 
       return res?.body;
     } finally {
@@ -38,12 +39,17 @@ class AuthService {
   }
 
   static setToken(String token) async {
+    await SESSION.set('tokenString', token);
     _AuthData data = _AuthData(token);
     await SESSION.set('token', data);
   }
 
   static Future<Map<String, dynamic>> getToken() async {
     return await SESSION.get('token');
+  }
+
+  static Future<String> getTokenString() async {
+    return await SESSION.get('tokenString');
   }
 
   static removeToken() async {

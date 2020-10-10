@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/services/auth_service.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../mixins/validation_mixin.dart';
+import 'package:covid19/src/mixins/validation_mixin.dart';
 
 class FormBloc with ValidationMixin {
   final _email = new BehaviorSubject<String>();
