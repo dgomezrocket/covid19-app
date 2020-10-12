@@ -1,4 +1,3 @@
-import 'package:covid19/src/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/account.dart';
@@ -7,6 +6,8 @@ import 'package:covid19/src/models/role.dart';
 import 'package:covid19/src/models/location.dart';
 import 'package:covid19/src/models/status.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
+import 'package:covid19/src/screens/login_screen.dart';
+import 'package:covid19/src/utils/widgets.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key}) : super(key: key);
@@ -60,7 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
       initialData: [],
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return _createCircularProgressIndicator();
+          return createCircularProgressIndicator();
         } else if (snapshot.hasData) {
           _loadData(snapshot.data);
 
@@ -72,20 +73,6 @@ class _ProfilePageState extends State<ProfilePage> {
           return LoginScreen();
         }
       },
-    );
-  }
-
-  _createCircularProgressIndicator() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-          ],
-        ),
-      ],
     );
   }
 
@@ -137,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: Icon(iconData)));
   }
 
-  List<DropdownMenuItem<String>> getOptionsDropdown() {
+  List<DropdownMenuItem<String>> _getOptionsDropdown() {
     List<DropdownMenuItem<String>> list = new List();
     _sexs.forEach((sex) {
       list.add(DropdownMenuItem(
@@ -157,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Expanded(
           child: DropdownButton(
             value: account.person.sex,
-            items: getOptionsDropdown(),
+            items: _getOptionsDropdown(),
             onChanged: setSex,
           ),
         )

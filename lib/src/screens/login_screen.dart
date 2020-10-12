@@ -14,43 +14,45 @@ class LoginScreen extends StatelessWidget {
     final FormBloc formBloc = Provider.of(context);
 
     return Scaffold(
-      body: Center(
-        child: Container(
-          margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
-          height: 550.0,
-          child: Form(
-            child: Column(
-              children: <Widget>[
-                _emailField(formBloc),
-                _passwordField(formBloc),
-                Container(
-                  width: 300,
-                  height: 35,
-                  child: Helper().errorMessage(formBloc),
-                ),
-                _checkBox(),
-                _buttonField(formBloc),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () =>
-                          Navigator.pushNamed(context, '/forgot_password'),
-                      child: Container(
-                        child: Text('Olvidaste la contraseña?'),
-                        alignment: Alignment.bottomLeft,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
+            height: 550.0,
+            child: Form(
+              child: Column(
+                children: <Widget>[
+                  _emailField(formBloc),
+                  _passwordField(formBloc),
+                  Container(
+                    width: 300,
+                    height: 35,
+                    child: Helper().errorMessage(formBloc),
+                  ),
+                  _checkBox(),
+                  _buttonField(formBloc),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () =>
+                            Navigator.pushNamed(context, '/forgot_password'),
+                        child: Container(
+                          child: Text('Olvidaste la contraseña?'),
+                          alignment: Alignment.bottomLeft,
+                        ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, '/signup'),
-                      child: Container(
-                        child: Text('Registrarse'),
-                        alignment: Alignment.bottomLeft,
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/signup'),
+                        child: Container(
+                          child: Text('Registrarse'),
+                          alignment: Alignment.bottomLeft,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

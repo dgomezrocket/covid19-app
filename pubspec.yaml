@@ -32,6 +32,8 @@ dependencies:
   rxdart: ^0.24.0
   http: ^0.12.2
   flutter_session: ^0.1.1
+  flutter_map:
+  latlong:
 
 dev_dependencies:
   flutter_test:

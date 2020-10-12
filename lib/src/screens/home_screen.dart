@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/pages/profile_page.dart';
 import 'package:covid19/src/pages/forms_page.dart';
 import 'package:covid19/src/services/auth_service.dart';
+import 'package:covid19/src/pages/map_page.dart';
+import 'package:covid19/src/pages/other_map.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,7 +15,12 @@ class Home extends StatefulWidget {
 
 class _HomeScreen extends State<Home> {
   int _currentIndex = 0;
-  final List<Widget> _screens = [ProfilePage(), FormPage()];
+  final List<Widget> _screens = [
+    ProfilePage(),
+    FormPage(),
+    OSMMap(),
+    //OtherMap()
+  ];
 
   @override
   Widget build(BuildContext context) {

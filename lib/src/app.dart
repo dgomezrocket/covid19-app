@@ -1,10 +1,11 @@
-import 'package:covid19/src/utils/routes.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/providers/provider.dart';
 import 'package:covid19/src/screens/home_screen.dart';
 import 'package:covid19/src/screens/login_screen.dart';
 import 'package:covid19/src/services/auth_service.dart';
+import 'package:covid19/src/utils/routes.dart';
+import 'package:covid19/src/utils/widgets.dart';
 
 class App extends StatelessWidget {
   @override
@@ -17,7 +18,7 @@ class App extends StatelessWidget {
           future: AuthService.getToken(),
           builder: (_, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return createCircularProgressIndicator();
             } else if (snapshot.hasData) {
               return Home();
             } else {

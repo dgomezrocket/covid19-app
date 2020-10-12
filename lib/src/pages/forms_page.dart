@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/options/check_opt.dart';
 import 'package:covid19/src/options/opt_with_checks.dart';
 import 'package:covid19/src/options/choice_opt.dart';
-import 'package:covid19/src/options/input_text_option.dart';
+import 'package:covid19/src/options/input_text_opt.dart';
 
 class FormPage extends StatefulWidget {
   @override
@@ -73,12 +73,12 @@ class _FormPageState extends State<FormPage> {
           description: 'Descripcion del elemento, esto puede ser largo',
           options: [InputOption(placeHolder: 'Responda aqui...')],
         ),
-        createButtonSave(),
+        _createButtonSave(),
       ],
     );
   }
 
-  createButtonSave() {
+  _createButtonSave() {
     return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
       FlatButton(
         child: Text('Guardar'),
