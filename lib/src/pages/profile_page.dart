@@ -6,10 +6,9 @@ import 'package:covid19/src/models/role.dart';
 import 'package:covid19/src/models/location.dart';
 import 'package:covid19/src/models/status.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
-import 'package:covid19/src/screens/login_screen.dart';
 import 'package:covid19/src/utils/widgets.dart';
-import 'package:covid19/src/services/auth_service.dart';
 import 'package:covid19/src/utils/util_classes.dart';
+import 'package:covid19/src/utils/functions_utils.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key}) : super(key: key);
@@ -19,7 +18,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Future<Person> personFetched;
+  Future<Person> _personFetched;
   Account _account = Account(
       id: 0,
       email: '',
@@ -44,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    personFetched = profileProvider.loadPersonData();
+    _personFetched = profileProvider.getPerson();
     _documentController.text = '';
     _nameController.text = '';
     _lastnameController.text = '';
@@ -61,30 +60,26 @@ class _ProfilePageState extends State<ProfilePage> {
 
   _loadProfile(BuildContext context) {
     return FutureBuilder(
-      future: personFetched,
+      future: _personFetched,
       initialData: null,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
-        } else if (snapshot.hasData) {
+        } else {
           _loadData(snapshot.data);
 
           return ListView(
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
             children: _createElements(),
           );
-        } else {
-          return LoginScreen();
         }
       },
     );
   }
 
-  T _cast<T>(x) => x is T ? x : null;
-
   _loadData(dynamic data) {
     if (data != null) {
-      _account.person = _cast<Person>(data);
+      _account.person = cast<Person>(data);
       _documentController.text = _account.person.document;
       _nameController.text = _account.person.name;
       _lastnameController.text = _account.person.lastname;

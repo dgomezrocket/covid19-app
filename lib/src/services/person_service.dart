@@ -7,10 +7,24 @@ import 'package:covid19/src/utils/config.dart';
 import 'package:covid19/src/services/auth_service.dart';
 
 class PersonService {
-  Future<dynamic> _getPersonBasedOnJwt() async {
+  Future<dynamic> loadPersonData() async {
     try {
       final String token = await AuthService.getTokenJwt();
-      var res = await http.post(
+      final resp = await http.get(
+        '$baseUrl/persons/my',
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+
+      return json.decode(resp?.body);
+    } finally {
+      // done you can do something here
+    }
+  }
+
+  Future<dynamic> getFormsData() async {
+    try {
+      final String token = await AuthService.getTokenJwt();
+      var res = await http.get(
         '$baseUrl/forms/',
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -18,26 +32,9 @@ class PersonService {
         },
       );
 
-      return res?.body;
+      return json.decode(res?.body);
     } finally {
       // done you can do something here
     }
   }
-
-  // _getForms(Map formsMap) {
-  //   Location location = Location(
-  //       id: personMap['location']['id'],
-  //       latitude: personMap['location']['latitude'],
-  //       longitude: personMap['location']['longitude']);
-  //   Status status = Status(
-  //       id: personMap['status']['id'], name: personMap['status']['name']);
-  //   Person profile =
-  //       Person(id: personMap['id'], location: location, status: status);
-  //   profile.document = personMap['document'];
-  //   profile.name = personMap['name'];
-  //   profile.lastname = personMap['lastname'];
-  //   profile.phone = personMap['phone'];
-  //   profile.sex = personMap['sex'];
-  //   return profile;
-  // }
 }

@@ -14,11 +14,16 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return Provider(
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
         title: "MSPBS",
+        debugShowCheckedModeBanner: false,
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('en', 'US'), // English
+          const Locale('es', 'ES'),
         ],
         home: FutureBuilder(
           future: AuthService.getToken(),

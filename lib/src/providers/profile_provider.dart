@@ -6,36 +6,27 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:covid19/src/models/person.dart';
-import 'package:covid19/src/services/auth_service.dart';
-import 'package:covid19/src/utils/config.dart';
-import 'package:covid19/src/models/location.dart';
-import 'package:covid19/src/models/status.dart';
+import 'package:covid19/src/services/person_service.dart';
+import 'package:covid19/src/models/form.dart';
 
 class _ProfileProvider {
-  _getPerson(Map personMap) {
-    Location location = Location(
-        id: personMap['location']['id'],
-        latitude: personMap['location']['latitude'],
-        longitude: personMap['location']['longitude']);
-    Status status = Status(
-        id: personMap['status']['id'], name: personMap['status']['name']);
-    Person profile =
-        Person(id: personMap['id'], location: location, status: status);
-    profile.document = personMap['document'];
-    profile.name = personMap['name'];
-    profile.lastname = personMap['lastname'];
-    profile.phone = personMap['phone'];
-    profile.sex = personMap['sex'];
-    return profile;
+  final personService = PersonService();
+
+  Future<Person> getPerson() async {
+    Map personMap = await personService.loadPersonData();
+
+    return Person.fromJson(personMap);
   }
 
-  Future<Person> loadPersonData() async {
-    final String token = await AuthService.getTokenJwt();
-    final resp = await http.get(
-      '$baseUrl/persons/my',
-      headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
-    );
-    return _getPerson(json.decode(resp?.body));
+  Future<List<FormPerson>> getForms() async {
+    Map formsMap = await personService.getFormsData();
+
+    var formsObjsJson = formsMap['forms'] as List;
+
+    List<FormPerson> forms =
+        formsObjsJson.map((formJson) => FormPerson.fromJson(formJson)).toList();
+
+    return forms;
   }
 }
 

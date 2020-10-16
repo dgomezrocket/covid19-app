@@ -1,89 +1,61 @@
+import 'package:covid19/src/options/form_item.dart';
 import 'package:flutter/material.dart';
 
-import 'package:covid19/src/options/check_opt.dart';
-import 'package:covid19/src/options/opt_with_checks.dart';
-import 'package:covid19/src/options/choice_opt.dart';
-import 'package:covid19/src/options/input_text_opt.dart';
+import 'package:covid19/src/models/form.dart';
+import 'package:covid19/src/providers/profile_provider.dart';
+import 'package:covid19/src/utils/functions_utils.dart';
+import 'package:covid19/src/utils/widgets.dart';
 
-class FormPage extends StatefulWidget {
+class FormsPage extends StatefulWidget {
   @override
-  _FormPageState createState() => _FormPageState();
+  _FormsPageState createState() => _FormsPageState();
 }
 
-class _FormPageState extends State<FormPage> {
+class _FormsPageState extends State<FormsPage> {
+  Future<List<FormPerson>> _formsFetched;
+
+  List<FormPerson> _forms;
+
+  @override
+  void initState() {
+    _formsFetched = profileProvider.getForms();
+    return super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: _createFormList(),
-      ),
+    return Container(
+      child: _createFormList(),
     );
   }
 
   _createFormList() {
-    return ListView(
-      children: [
-        CheckOption(
-          title: 'Elemento de un formulario 1',
-          description: 'Descripcion del elemento, esto puede ser largo',
-        ),
-        CheckOption(
-          title: 'Elemento de un formulario 2',
-          description: 'Descripcion del elemento, esto puede ser largo',
-        ),
-        ItemWithOption(
-          title: 'Elemento de un formulario 3',
-          description: 'Descripcion del elemento, esto puede ser largo',
-          options: [
-            CheckOption(
-              title: 'Elemento de un formulario 1',
-              description: 'Descripcion del elemento, esto puede ser largo',
-            ),
-            CheckOption(
-              title: 'Elemento de un formulario 2',
-              description: 'Descripcion del elemento, esto puede ser largo',
-            ),
-          ],
-        ),
-        ItemWithOption(
-          title: 'Elemento de un formulario 3',
-          description: 'Descripcion del elemento, esto puede ser largo',
-          options: [
-            ChoiceOption(children: [
-              ChoiceItem(
-                title: 'Elemento de un formulario 1',
-                description: 'Descripcion del elemento, esto puede ser largo',
-                choiceValue: 0,
-              ),
-              ChoiceItem(
-                title: 'Elemento de un formulario 1',
-                description: 'Descripcion del elemento, esto puede ser largo',
-                choiceValue: 1,
-              ),
-              ChoiceItem(
-                title: 'Elemento de un formulario 1',
-                description: 'Descripcion del elemento, esto puede ser largo',
-                choiceValue: 2,
-              ),
-            ]),
-          ],
-        ),
-        ItemWithOption(
-          title: 'Elemento de un formulario 3',
-          description: 'Descripcion del elemento, esto puede ser largo',
-          options: [InputOption(placeHolder: 'Responda aqui...')],
-        ),
-        _createButtonSave(),
-      ],
+    return FutureBuilder(
+      future: _formsFetched,
+      initialData: null,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return createCircularProgressIndicator();
+        } else {
+          _loadData(snapshot.data);
+
+          return ListView(
+            children: _forms.map(_createElements).toList(),
+          );
+        }
+      },
     );
   }
 
-  _createButtonSave() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      FlatButton(
-        child: Text('Guardar'),
-        onPressed: () {},
-      )
-    ]);
+  _loadData(dynamic data) {
+    // print('la data es = ');
+    // print(data.toString());
+    if (data != null) {
+      _forms = cast<List<FormPerson>>(data);
+    }
+  }
+
+  Widget _createElements(FormPerson formPerson) {
+    return FormItem(form: formPerson);
   }
 }
