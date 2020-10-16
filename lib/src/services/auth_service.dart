@@ -39,7 +39,6 @@ class AuthService {
   }
 
   static setToken(String token) async {
-    await SESSION.set('tokenString', token);
     _AuthData data = _AuthData(token);
     await SESSION.set('token', data);
   }
@@ -48,12 +47,13 @@ class AuthService {
     return await SESSION.get('token');
   }
 
-  static Future<String> getTokenString() async {
-    return await SESSION.get('tokenString');
-  }
-
   static removeToken() async {
     await SESSION.prefs.clear();
+  }
+
+  static getTokenJwt() async {
+    dynamic tokenMap = (await SESSION.get('token'));
+    return tokenMap['jwt'];
   }
 }
 

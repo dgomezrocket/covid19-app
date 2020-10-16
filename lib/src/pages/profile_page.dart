@@ -8,6 +8,8 @@ import 'package:covid19/src/models/status.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
 import 'package:covid19/src/screens/login_screen.dart';
 import 'package:covid19/src/utils/widgets.dart';
+import 'package:covid19/src/services/auth_service.dart';
+import 'package:covid19/src/utils/util_classes.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key}) : super(key: key);
@@ -17,7 +19,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Account account = Account(
+  Future<Person> personFetched;
+  Account _account = Account(
       id: 0,
       email: '',
       person: Person(
@@ -26,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
           name: '',
           lastname: '',
           phone: '',
-          sex: '',
+          sex: 'MASCULINO',
           location: Location(id: 0, latitude: 0.0, longitude: 0.0),
           status: Status(id: 0, name: '')),
       role: Role(id: 0, name: ''));
@@ -34,13 +37,14 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> _sexs = ['MASCULINO', 'FENEMINO'];
 
   // controllers for form text controllers
-  TextEditingController _documentController = new TextEditingController();
-  TextEditingController _nameController = new TextEditingController();
-  TextEditingController _lastnameController = new TextEditingController();
-  TextEditingController _phoneController = new TextEditingController();
+  PhoneEditingController _documentController = new PhoneEditingController();
+  PhoneEditingController _nameController = new PhoneEditingController();
+  PhoneEditingController _lastnameController = new PhoneEditingController();
+  PhoneEditingController _phoneController = new PhoneEditingController();
 
   @override
   void initState() {
+    personFetched = profileProvider.loadPersonData();
     _documentController.text = '';
     _nameController.text = '';
     _lastnameController.text = '';
@@ -50,16 +54,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _loadProfile(),
+    return Container(
+      child: _loadProfile(context),
     );
   }
 
-  Widget _loadProfile() {
+  _loadProfile(BuildContext context) {
     return FutureBuilder(
-      future: profileProvider.loadData(),
-      initialData: [],
-      builder: (_, snapshot) {
+      future: personFetched,
+      initialData: null,
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
         } else if (snapshot.hasData) {
@@ -79,28 +83,30 @@ class _ProfilePageState extends State<ProfilePage> {
   T _cast<T>(x) => x is T ? x : null;
 
   _loadData(dynamic data) {
-    account.person = _cast<Person>(data);
-    _documentController.text = account.person.document;
-    _nameController.text = account.person.name;
-    _lastnameController.text = account.person.lastname;
-    _phoneController.text = account.person.phone;
+    if (data != null) {
+      _account.person = _cast<Person>(data);
+      _documentController.text = _account.person.document;
+      _nameController.text = _account.person.name;
+      _lastnameController.text = _account.person.lastname;
+      _phoneController.text = _account.person.phone;
+    }
   }
 
   List<Widget> _createElements() {
     return <Widget>[
       _createInput('Número de Documento', 'Documento', _documentController,
-          setDocument, Icons.accessibility, Icons.person_pin),
+          _setDocument, Icons.accessibility, Icons.person_pin),
       Divider(),
-      _createInput('Nombres', 'Nombres', _nameController, setName,
+      _createInput('Nombres', 'Nombres', _nameController, _setName,
           Icons.accessibility, Icons.account_circle),
       Divider(),
-      _createInput('Apellidos', 'Apellidos', _lastnameController, setLastname,
+      _createInput('Apellidos', 'Apellidos', _lastnameController, _setLastname,
           Icons.accessibility, Icons.account_circle),
       Divider(),
       // _createInput(
       //     'Email', 'Email', setEmail, Icons.alternate_email, Icons.email),
       // Divider(),
-      _createInput('Teléfono', 'Teléfono', _phoneController, setphone,
+      _createInput('Teléfono', 'Teléfono', _phoneController, _setphone,
           Icons.share_sharp, Icons.phone_android_outlined),
       Divider(),
       _createDropdown(),
@@ -111,17 +117,20 @@ class _ProfilePageState extends State<ProfilePage> {
       String hintText,
       String labelText,
       TextEditingController controller,
-      Function onChange,
+      Function onChangeFunction,
       IconData suffixIcon,
       IconData iconData) {
     return TextField(
-        controller: controller,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: InputDecoration(
-            hintText: hintText,
-            labelText: labelText,
-            suffixIcon: Icon(suffixIcon),
-            icon: Icon(iconData)));
+      controller: controller,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(
+          counter: Text('${controller.text.length}'),
+          hintText: hintText,
+          labelText: labelText,
+          suffixIcon: Icon(suffixIcon),
+          icon: Icon(iconData)),
+      onChanged: onChangeFunction,
+    );
   }
 
   List<DropdownMenuItem<String>> _getOptionsDropdown() {
@@ -143,36 +152,36 @@ class _ProfilePageState extends State<ProfilePage> {
         SizedBox(width: 30.0),
         Expanded(
           child: DropdownButton(
-            value: account.person.sex,
+            value: _account.person.sex,
             items: _getOptionsDropdown(),
-            onChanged: setSex,
+            onChanged: _setSex,
           ),
         )
       ],
     );
   }
 
-  setDocument(String document) {
-    setState(() => account.person.document = document);
+  _setDocument(document) {
+    setState(() => _account.person.document = document);
   }
 
-  setName(String name) {
-    setState(() => account.person.name = name);
+  _setName(name) {
+    setState(() => _account.person.name = name);
   }
 
-  setLastname(String lastname) {
-    setState(() => account.person.lastname = lastname);
+  _setLastname(lastname) {
+    setState(() => _account.person.lastname = lastname);
   }
 
-  setEmail(String email) {
-    setState(() => account.email = email);
+  _setEmail(email) {
+    setState(() => _account.email = email);
   }
 
-  setphone(String phone) {
-    setState(() => account.person.phone = phone);
+  _setphone(phone) {
+    setState(() => _account.person.phone = phone);
   }
 
-  setSex(sex) {
-    setState(() => account.person.sex = sex);
+  _setSex(sex) {
+    setState(() => _account.person.sex = sex);
   }
 }

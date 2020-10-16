@@ -13,7 +13,14 @@ import 'package:covid19/src/models/status.dart';
 
 class _ProfileProvider {
   _getPerson(Map personMap) {
-    Person profile = Person(id: 0, location: Location(), status: Status());
+    Location location = Location(
+        id: personMap['location']['id'],
+        latitude: personMap['location']['latitude'],
+        longitude: personMap['location']['longitude']);
+    Status status = Status(
+        id: personMap['status']['id'], name: personMap['status']['name']);
+    Person profile =
+        Person(id: personMap['id'], location: location, status: status);
     profile.document = personMap['document'];
     profile.name = personMap['name'];
     profile.lastname = personMap['lastname'];
@@ -22,10 +29,10 @@ class _ProfileProvider {
     return profile;
   }
 
-  Future<dynamic> loadData() async {
-    final String token = await AuthService.getTokenString();
+  Future<Person> loadPersonData() async {
+    final String token = await AuthService.getTokenJwt();
     final resp = await http.get(
-      '$baseUrl/persons',
+      '$baseUrl/persons/my',
       headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
     );
     return _getPerson(json.decode(resp?.body));

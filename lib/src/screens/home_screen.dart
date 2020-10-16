@@ -4,7 +4,6 @@ import 'package:covid19/src/pages/profile_page.dart';
 import 'package:covid19/src/pages/forms_page.dart';
 import 'package:covid19/src/services/auth_service.dart';
 import 'package:covid19/src/pages/map_page.dart';
-import 'package:covid19/src/pages/other_map.dart';
 
 class Home extends StatefulWidget {
   @override

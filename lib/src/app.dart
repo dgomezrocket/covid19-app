@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:covid19/src/providers/provider.dart';
 import 'package:covid19/src/screens/home_screen.dart';
 import 'package:covid19/src/screens/login_screen.dart';
@@ -14,9 +16,13 @@ class App extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "MSPBS",
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
         home: FutureBuilder(
           future: AuthService.getToken(),
-          builder: (_, snapshot) {
+          builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return createCircularProgressIndicator();
             } else if (snapshot.hasData) {
