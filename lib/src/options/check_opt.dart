@@ -30,10 +30,12 @@ class _CheckOptionState extends State<CheckOption> {
         title: Text(
           widget.title,
           style: title_style,
+          locale: localES,
         ),
         subtitle: Text(
           widget.description,
           style: description_style,
+          locale: localES,
         ),
       ),
       Divider(),

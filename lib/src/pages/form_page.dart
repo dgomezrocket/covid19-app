@@ -8,6 +8,7 @@ import 'package:covid19/src/options/choice_opt.dart';
 import 'package:covid19/src/options/input_text_opt.dart';
 import 'package:covid19/src/models/form.dart';
 import 'package:covid19/src/models/item.dart';
+import 'package:covid19/src/utils/styles_options.dart';
 
 class FormPage extends StatefulWidget {
   final FormPerson form;
@@ -26,6 +27,7 @@ class _FormPageState extends State<FormPage> {
         title: Text(widget.form.title),
       ),
       body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 10.0),
         children: widget.form.itemsForm.map(_createFormList).toList(),
       ),
       bottomNavigationBar: _createButtonSave(context),
@@ -74,11 +76,14 @@ class _FormPageState extends State<FormPage> {
           return AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
-            title: Text('Titulo'),
+            title: Text('Confirmar'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text('¿Está seguro de que desea guardar?'),
+                Text(
+                  '¿Está seguro de que desea guardar?',
+                  locale: localES,
+                ),
                 Icon(
                   Icons.save,
                   size: 50.0,

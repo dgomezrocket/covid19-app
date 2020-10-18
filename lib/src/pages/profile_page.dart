@@ -9,6 +9,7 @@ import 'package:covid19/src/providers/profile_provider.dart';
 import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/utils/util_classes.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
+import 'package:covid19/src/utils/util_constants.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key}) : super(key: key);
@@ -33,6 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
           status: Status(id: 0, name: '')),
       role: Role(id: 0, name: ''));
 
+  String _birthDay = '';
+
   List<String> _sexs = ['MASCULINO', 'FENEMINO'];
 
   // controllers for form text controllers
@@ -40,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   PhoneEditingController _nameController = new PhoneEditingController();
   PhoneEditingController _lastnameController = new PhoneEditingController();
   PhoneEditingController _phoneController = new PhoneEditingController();
+  TextEditingController _birthDayController = new TextEditingController();
 
   @override
   void initState() {
@@ -104,6 +108,8 @@ class _ProfilePageState extends State<ProfilePage> {
       _createInput('Teléfono', 'Teléfono', _phoneController, _setphone,
           Icons.share_sharp, Icons.phone_android_outlined),
       Divider(),
+      _crearFecha(context),
+      Divider(),
       _createDropdown(),
     ];
   }
@@ -138,6 +144,39 @@ class _ProfilePageState extends State<ProfilePage> {
     });
 
     return list;
+  }
+
+  Widget _crearFecha(BuildContext context) {
+    return TextField(
+      enableInteractiveSelection: false,
+      controller: _birthDayController,
+      decoration: InputDecoration(
+          hintText: 'Fecha de nacimiento',
+          labelText: 'Fecha de nacimiento',
+          suffixIcon: Icon(Icons.perm_contact_calendar),
+          icon: Icon(Icons.calendar_today)),
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+        _selectDate(context);
+      },
+    );
+  }
+
+  _selectDate(BuildContext context) async {
+    DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(DateTime.now().year - adultAge),
+      firstDate: DateTime(1800),
+      lastDate: DateTime(DateTime.now().year - adultAge),
+      locale: Locale('es', 'ES'),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _birthDay = picked.toString();
+        _birthDayController.text = _birthDay;
+      });
+    }
   }
 
   Widget _createDropdown() {

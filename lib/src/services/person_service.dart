@@ -15,7 +15,7 @@ class PersonService {
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
       );
 
-      return json.decode(resp?.body);
+      return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
       // done you can do something here
     }
@@ -24,7 +24,7 @@ class PersonService {
   Future<dynamic> getFormsData() async {
     try {
       final String token = await AuthService.getTokenJwt();
-      var res = await http.get(
+      var resp = await http.get(
         '$baseUrl/forms/',
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -32,7 +32,7 @@ class PersonService {
         },
       );
 
-      return json.decode(res?.body);
+      return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
       // done you can do something here
     }

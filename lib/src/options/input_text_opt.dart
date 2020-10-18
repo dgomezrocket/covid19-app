@@ -26,8 +26,8 @@ class _InputOptionState extends State<InputOption> {
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           hintText: widget.placeHolder,
-          suffixIcon: Icon(Icons.playlist_add),
-          icon: Icon(Icons.read_more),
+          // suffixIcon: Icon(Icons.playlist_add),
+          // icon: Icon(Icons.read_more),
         ),
         onChanged: _setData,
       ),

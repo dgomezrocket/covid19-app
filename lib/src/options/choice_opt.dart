@@ -42,10 +42,12 @@ class _ChoiceOptionState extends State<ChoiceOption> {
         title: Text(
           choiceItem.title,
           style: title_style,
+          locale: localES,
         ),
         subtitle: Text(
           choiceItem.description,
           style: description_style,
+          locale: localES,
         ),
       ),
       Divider(),

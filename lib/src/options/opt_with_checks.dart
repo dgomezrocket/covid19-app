@@ -22,10 +22,12 @@ class _ItemWithOptionState extends State<ItemWithOption> {
           title: Text(
             widget.title,
             style: title_style,
+            locale: localES,
           ),
           subtitle: Text(
             widget.description,
             style: description_style,
+            locale: localES,
           ),
           children: widget.options,
         ),

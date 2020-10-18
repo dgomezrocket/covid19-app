@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/form.dart';
 import 'package:covid19/src/pages/form_page.dart';
+import 'package:covid19/src/utils/styles_options.dart';
 
 class FormItem extends StatefulWidget {
   final FormPerson form;
@@ -17,8 +18,16 @@ class _FormItemState extends State<FormItem> {
   Widget build(BuildContext context) {
     return Column(children: [
       ListTile(
-        title: Text(widget.form.title),
-        subtitle: Text(widget.form.subtitle),
+        title: Text(
+          widget.form.title,
+          style: title_style,
+          locale: localES,
+        ),
+        subtitle: Text(
+          widget.form.subtitle,
+          style: description_style,
+          locale: localES,
+        ),
         leading: Icon(Icons.read_more),
         trailing: Icon(Icons.keyboard_arrow_right, color: Colors.blue),
         onTap: () {

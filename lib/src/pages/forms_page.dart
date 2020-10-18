@@ -14,7 +14,7 @@ class FormsPage extends StatefulWidget {
 class _FormsPageState extends State<FormsPage> {
   Future<List<FormPerson>> _formsFetched;
 
-  List<FormPerson> _forms;
+  List<FormPerson> _forms = List();
 
   @override
   void initState() {
@@ -48,11 +48,7 @@ class _FormsPageState extends State<FormsPage> {
   }
 
   _loadData(dynamic data) {
-    // print('la data es = ');
-    // print(data.toString());
-    if (data != null) {
-      _forms = cast<List<FormPerson>>(data);
-    }
+    if (data != null) _forms = cast<List<FormPerson>>(data);
   }
 
   Widget _createElements(FormPerson formPerson) {
