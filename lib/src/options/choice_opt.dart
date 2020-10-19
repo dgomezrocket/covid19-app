@@ -11,9 +11,9 @@ class ChoiceItem {
 }
 
 class ChoiceOption extends StatefulWidget {
-  final List<ChoiceItem> children;
+  List<ChoiceItem> children;
 
-  const ChoiceOption({this.children});
+  ChoiceOption({this.children});
 
   @override
   _ChoiceOptionState createState() => _ChoiceOptionState();

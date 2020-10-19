@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 
 class CheckOption extends StatefulWidget {
-  final String title;
-  final String description;
+  String title;
+  String description;
+  bool value;
 
-  const CheckOption({this.title, this.description});
+  CheckOption({this.title, this.description, this.value});
 
   @override
   _CheckOptionState createState() => _CheckOptionState();
 }
 
 class _CheckOptionState extends State<CheckOption> {
-  bool check = false;
-
   void _onRememberMeChanged(bool newValue) => setState(() {
-        check = newValue;
+        widget.value = newValue;
       });
 
   @override
@@ -24,7 +23,7 @@ class _CheckOptionState extends State<CheckOption> {
     return Column(children: [
       ListTile(
         leading: Checkbox(
-          value: check,
+          value: widget.value,
           onChanged: _onRememberMeChanged,
         ),
         title: Text(

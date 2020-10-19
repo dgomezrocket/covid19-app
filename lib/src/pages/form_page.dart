@@ -39,17 +39,20 @@ class _FormPageState extends State<FormPage> {
       return CheckOption(
         title: item.title,
         description: item.subtitle,
+        value: false,
       );
     else if (item.type.toString() == 'INPUT_TEXT')
       return ItemWithOption(
         title: item.title,
         description: item.subtitle,
-        options: [InputOption(placeHolder: 'Responda aqui...')],
+        check: false,
+        options: [InputOption(placeHolder: 'Responda aqui...', value: '')],
       );
     else //if (item.type == 'LIST')
       return ItemWithOption(
         title: item.title,
         description: item.subtitle,
+        check: false,
         options: [],
       );
   }

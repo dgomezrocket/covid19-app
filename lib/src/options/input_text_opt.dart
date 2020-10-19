@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 
 class InputOption extends StatefulWidget {
-  final String placeHolder;
+  String value;
+  String placeHolder;
 
-  const InputOption({this.placeHolder});
+  InputOption({this.placeHolder, this.value});
 
   @override
   _InputOptionState createState() => _InputOptionState();
 }
 
 class _InputOptionState extends State<InputOption> {
-  String data = '';
-
   void _setData(String newValue) => setState(() {
-        data = newValue;
+        widget.value = newValue;
       });
 
   @override
@@ -26,8 +25,6 @@ class _InputOptionState extends State<InputOption> {
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           hintText: widget.placeHolder,
-          // suffixIcon: Icon(Icons.playlist_add),
-          // icon: Icon(Icons.read_more),
         ),
         onChanged: _setData,
       ),

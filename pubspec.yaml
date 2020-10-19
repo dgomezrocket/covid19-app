@@ -37,6 +37,7 @@ dependencies:
   flutter_session: ^0.1.1
   flutter_map:
   latlong:
+  geolocator: ^6.0.0
 
 dev_dependencies:
   flutter_test:

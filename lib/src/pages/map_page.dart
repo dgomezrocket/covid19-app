@@ -49,19 +49,22 @@ class _OSMMapState extends State<OSMMap> {
                 ),
               ],
             ),
-            MarkerLayerOptions(markers: [
-              Marker(
+            MarkerLayerOptions(
+              markers: [
+                Marker(
                   width: 45.0,
                   height: 45.0,
                   point: LatLng(-25.336135, -57.512170),
                   builder: (context) => Container(
-                        child: IconButton(
-                            icon: Icon(Icons.accessibility),
-                            onPressed: () {
-                              print('Marker tapped!');
-                            }),
-                      ))
-            ])
+                    child: IconButton(
+                        icon: Icon(Icons.accessibility),
+                        onPressed: () {
+                          print('Marker tapped!');
+                        }),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ],
