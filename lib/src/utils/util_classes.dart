@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class PhoneEditingController extends TextEditingController {
+class CustomEditingController extends TextEditingController {
   @override
   set text(String newText) {
     value = value.copyWith(

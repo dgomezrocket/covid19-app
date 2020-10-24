@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/services/person_service.dart';
 import 'package:covid19/src/models/form.dart';
+import 'package:covid19/src/models/answer.dart';
 
 class _ProfileProvider {
   final personService = PersonService();
@@ -27,6 +28,28 @@ class _ProfileProvider {
         formsObjsJson.map((formJson) => FormPerson.fromJson(formJson)).toList();
 
     return forms;
+  }
+
+  Future<List<Answer>> getAnswers() async {
+    Map answersMap = await personService.getAnswersData();
+
+    var answersObjsJson = answersMap['answers'] as List;
+
+    List<Answer> answers = answersObjsJson
+        .map((answerJson) => Answer.fromJson(answerJson))
+        .toList();
+
+    return answers;
+  }
+
+  Future<bool> postAnswer(Answer answer) async {
+    final res = await personService.postAnswersData(answer);
+    final data = jsonDecode(res) as Map<String, dynamic>;
+    if (data['status'] == null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 

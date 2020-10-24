@@ -10,6 +10,7 @@ import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/utils/util_classes.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/util_constants.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key}) : super(key: key);
@@ -28,22 +29,25 @@ class _ProfilePageState extends State<ProfilePage> {
           document: '',
           name: '',
           lastname: '',
+          birthDate: DateTime.now(),
           phone: '',
           sex: 'MASCULINO',
+          address: '',
           location: Location(id: 0, latitude: 0.0, longitude: 0.0),
           status: Status(id: 0, name: '')),
       role: Role(id: 0, name: ''));
 
-  String _birthDay = '';
+  final dateFormat = DateFormat('dd/MM/yyyy');
 
   List<String> _sexs = ['MASCULINO', 'FENEMINO'];
 
   // controllers for form text controllers
-  PhoneEditingController _documentController = new PhoneEditingController();
-  PhoneEditingController _nameController = new PhoneEditingController();
-  PhoneEditingController _lastnameController = new PhoneEditingController();
-  PhoneEditingController _phoneController = new PhoneEditingController();
-  TextEditingController _birthDayController = new TextEditingController();
+  CustomEditingController _documentController = new CustomEditingController();
+  CustomEditingController _nameController = new CustomEditingController();
+  CustomEditingController _lastnameController = new CustomEditingController();
+  CustomEditingController _birthDateController = new CustomEditingController();
+  CustomEditingController _phoneController = new CustomEditingController();
+  CustomEditingController _addressController = new CustomEditingController();
 
   @override
   void initState() {
@@ -51,7 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
     _documentController.text = '';
     _nameController.text = '';
     _lastnameController.text = '';
+    _birthDateController.text = '';
     _phoneController.text = '';
+    _addressController.text = '';
     return super.initState();
   }
 
@@ -73,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _loadData(snapshot.data);
 
           return ListView(
-            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
             children: _createElements(),
           );
         }
@@ -87,7 +93,11 @@ class _ProfilePageState extends State<ProfilePage> {
       _documentController.text = _account.person.document;
       _nameController.text = _account.person.name;
       _lastnameController.text = _account.person.lastname;
+      _birthDateController.text = _account.person.birthDate == null
+          ? ''
+          : dateFormat.format(DateTime.now());
       _phoneController.text = _account.person.phone;
+      _addressController.text = _account.person.address;
     }
   }
 
@@ -108,7 +118,10 @@ class _ProfilePageState extends State<ProfilePage> {
       _createInput('Teléfono', 'Teléfono', _phoneController, _setphone,
           Icons.share_sharp, Icons.phone_android_outlined),
       Divider(),
-      _crearFecha(context),
+      _createInput('Dirección de domicilio', 'Dirección', _addressController,
+          _setEmail, Icons.share_sharp, Icons.edit_location),
+      Divider(),
+      _createInputDate(context),
       Divider(),
       _createDropdown(),
     ];
@@ -146,12 +159,12 @@ class _ProfilePageState extends State<ProfilePage> {
     return list;
   }
 
-  Widget _crearFecha(BuildContext context) {
+  Widget _createInputDate(BuildContext context) {
     return TextField(
       enableInteractiveSelection: false,
-      controller: _birthDayController,
+      controller: _birthDateController,
       decoration: InputDecoration(
-          hintText: 'Fecha de nacimiento',
+          hintText: 'Fecha de nacimiento en dia/mes/año',
           labelText: 'Fecha de nacimiento',
           suffixIcon: Icon(Icons.perm_contact_calendar),
           icon: Icon(Icons.calendar_today)),
@@ -167,14 +180,14 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       initialDate: DateTime(DateTime.now().year - adultAge),
       firstDate: DateTime(1800),
-      lastDate: DateTime(DateTime.now().year - adultAge),
+      lastDate: DateTime.now(), //DateTime(DateTime.now().year - adultAge),
       locale: Locale('es', 'ES'),
     );
 
     if (picked != null) {
       setState(() {
-        _birthDay = picked.toString();
-        _birthDayController.text = _birthDay;
+        _account.person.birthDate = picked;
+        _birthDateController.text = dateFormat.format(picked);
       });
     }
   }

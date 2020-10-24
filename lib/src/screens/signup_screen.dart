@@ -50,8 +50,8 @@ class SignupScreen extends StatelessWidget {
           return TextField(
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              hintText: 'you@example.com',
-              labelText: 'Email',
+              hintText: 'correo@ejemplo.com',
+              labelText: 'Correo',
               errorText: snapshot.error,
             ),
             onChanged: bloc.changeEmail,
@@ -69,7 +69,7 @@ class SignupScreen extends StatelessWidget {
             maxLength: 20,
             decoration: InputDecoration(
               hintText: '',
-              labelText: 'Password',
+              labelText: 'Contraseña',
               errorText: snapshot.error,
             ),
           );

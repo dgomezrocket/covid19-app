@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:covid19/src/models/option.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 
-class ChoiceItem {
-  final String title;
-  final String description;
-  final int choiceValue;
-
-  const ChoiceItem({this.title, this.description, this.choiceValue});
-}
-
 class ChoiceOption extends StatefulWidget {
-  List<ChoiceItem> children;
+  List<Option> children;
+  int value = 0;
 
   ChoiceOption({this.children});
 
@@ -20,10 +14,8 @@ class ChoiceOption extends StatefulWidget {
 }
 
 class _ChoiceOptionState extends State<ChoiceOption> {
-  int _choice = 0;
-
   void _onRememberMeChanged(int newValue) => setState(() {
-        _choice = newValue;
+        widget.value = newValue;
       });
 
   @override
@@ -31,12 +23,12 @@ class _ChoiceOptionState extends State<ChoiceOption> {
     return Column(children: widget.children.map(createRadioOption).toList());
   }
 
-  Widget createRadioOption(ChoiceItem choiceItem) {
+  Widget createRadioOption(Option choiceItem) {
     return Column(children: [
       ListTile(
         leading: Radio(
-          value: choiceItem.choiceValue,
-          groupValue: _choice,
+          value: choiceItem.id,
+          groupValue: widget.value,
           onChanged: _onRememberMeChanged,
         ),
         title: Text(
@@ -45,7 +37,7 @@ class _ChoiceOptionState extends State<ChoiceOption> {
           locale: localES,
         ),
         subtitle: Text(
-          choiceItem.description,
+          choiceItem.subtitle,
           style: description_style,
           locale: localES,
         ),

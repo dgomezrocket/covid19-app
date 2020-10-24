@@ -4,6 +4,7 @@ import 'package:covid19/src/pages/profile_page.dart';
 import 'package:covid19/src/pages/forms_page.dart';
 import 'package:covid19/src/services/auth_service.dart';
 import 'package:covid19/src/pages/map_page.dart';
+// import 'package:covid19/src/pages/livemap_location.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class _HomeScreen extends State<Home> {
   final List<Widget> _screens = [
     ProfilePage(),
     FormsPage(),
-    OSMMap(),
+    OSMMap(), //LiveMap()
     //OtherMap()
   ];
 
@@ -25,6 +26,7 @@ class _HomeScreen extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(children: [
           Text('Conacyt App'),
           Expanded(
@@ -38,8 +40,7 @@ class _HomeScreen extends State<Home> {
                     decoration: TextDecoration.underline,
                   )),
               onTap: () {
-                AuthService.removeToken();
-                Navigator.popAndPushNamed(context, '/login');
+                _logout(context);
               }),
         ]),
       ),
@@ -66,6 +67,28 @@ class _HomeScreen extends State<Home> {
           BottomNavigationBarItem(
             icon: new Icon(Icons.mail),
             title: Text('Mensajes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _logout(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Salir'),
+        content: Text('¿Está seguro que desea salir?'),
+        actions: [
+          FlatButton(
+              child: Text('Sí'),
+              onPressed: () {
+                AuthService.removeToken();
+                Navigator.popAndPushNamed(context, '/login');
+              }),
+          FlatButton(
+            child: Text('No'),
+            onPressed: () => Navigator.pop(context, false),
           ),
         ],
       ),

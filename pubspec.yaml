@@ -35,9 +35,10 @@ dependencies:
   rxdart: ^0.24.0
   http: ^0.12.2
   flutter_session: ^0.1.1
+  intl: ^0.16.1
   flutter_map:
   latlong:
-  geolocator: ^6.0.0
+  geolocator: ^6.1.1
 
 dev_dependencies:
   flutter_test:

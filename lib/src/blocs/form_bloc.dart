@@ -43,8 +43,7 @@ class FormBloc with ValidationMixin {
 
     final res = await authInfo.register(_email.value, _password.value);
     final data = jsonDecode(res) as Map<String, dynamic>;
-
-    if (data['status'] != 200) {
+    if (data['status'] != null) {
       addError(data['message']);
     } else {
       //AuthService.setToken(data['token']);

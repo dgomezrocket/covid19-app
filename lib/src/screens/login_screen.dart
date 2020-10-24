@@ -29,7 +29,7 @@ class LoginScreen extends StatelessWidget {
                     height: 35,
                     child: Helper().errorMessage(formBloc),
                   ),
-                  _checkBox(),
+                  //_checkBox(),
                   _buttonField(formBloc),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

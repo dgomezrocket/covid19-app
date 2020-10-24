@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:covid19/src/models/item.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 
 class CheckOption extends StatefulWidget {
-  String title;
-  String description;
+  Item item;
   bool value;
 
-  CheckOption({this.title, this.description, this.value});
+  CheckOption({this.item, this.value});
 
   @override
   _CheckOptionState createState() => _CheckOptionState();
@@ -27,15 +27,16 @@ class _CheckOptionState extends State<CheckOption> {
           onChanged: _onRememberMeChanged,
         ),
         title: Text(
-          widget.title,
+          widget.item.title,
           style: title_style,
           locale: localES,
         ),
         subtitle: Text(
-          widget.description,
+          widget.item.subtitle,
           style: description_style,
           locale: localES,
         ),
+        onTap: () => _onRememberMeChanged(!widget.value),
       ),
       Divider(),
     ]);
