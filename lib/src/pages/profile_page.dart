@@ -211,18 +211,6 @@ class _ProfilePageState extends State<ProfilePage> {
         return null;
       },
     );
-
-    // return TextField(
-    //   controller: controller,
-    //   textCapitalization: TextCapitalization.sentences,
-    //   decoration: InputDecoration(
-    //       counter: Text('${controller.text.length}'),
-    //       hintText: hintText,
-    //       labelText: labelText,
-    //       suffixIcon: Icon(suffixIcon),
-    //       icon: Icon(iconData)),
-    //   onChanged: onChangeFunction,
-    // );
   }
 
   List<DropdownMenuItem<String>> _getOptionsDropdown() {
@@ -289,17 +277,20 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _createSaveButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: RaisedButton(
+      child: ElevatedButton(
         onPressed: () {
           _showConfirmation(context);
         },
-        child: const Icon(Icons.arrow_forward),
-        color: Colors.amber,
-        clipBehavior: Clip.hardEdge,
-        elevation: 10,
-        disabledColor: Colors.blueGrey,
-        disabledElevation: 10,
-        disabledTextColor: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.save_alt),
+            SizedBox(
+              width: 5.0,
+            ),
+            Text('Guardar'), // : Color(Colors.white),)
+          ],
+        ),
       ),
     );
   }
