@@ -40,6 +40,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   final dateFormat = DateFormat('dd/MM/yyyy');
 
+  final _formKey = GlobalKey<FormState>();
+
   List<String> _sexs = ['MASCULINO', 'FENEMINO'];
 
   bool _load = false;
@@ -85,9 +87,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
           return Stack(
             children: [
-              ListView(
-                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                children: _createElements(),
+              Form(
+                key: _formKey,
+                child: ListView(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  children: _createElements(),
+                ),
               ),
               Align(
                 child: loadingIndicator,
@@ -116,23 +122,58 @@ class _ProfilePageState extends State<ProfilePage> {
 
   List<Widget> _createElements() {
     return <Widget>[
-      _createInput('Número de Documento', 'Documento', _documentController,
-          _setDocument, Icons.accessibility, Icons.person_pin),
+      _createInput(
+          'Número de Documento',
+          'Documento',
+          'Introduzca el documento',
+          _documentController,
+          _setDocument,
+          _nonEmptyValidation,
+          Icons.accessibility,
+          Icons.person_pin),
       Divider(),
-      _createInput('Nombres', 'Nombres', _nameController, _setName,
-          Icons.accessibility, Icons.account_circle),
+      _createInput(
+          'Nombres',
+          'Nombres',
+          'Introduzca el/los nombre/s',
+          _nameController,
+          _setName,
+          _nonEmptyValidation,
+          Icons.accessibility,
+          Icons.account_circle),
       Divider(),
-      _createInput('Apellidos', 'Apellidos', _lastnameController, _setLastname,
-          Icons.accessibility, Icons.account_circle),
+      _createInput(
+          'Apellidos',
+          'Apellidos',
+          'Introduzca el/los apellido/s',
+          _lastnameController,
+          _setLastname,
+          _nonEmptyValidation,
+          Icons.accessibility,
+          Icons.account_circle),
       Divider(),
       // _createInput(
       //     'Email', 'Email', setEmail, Icons.alternate_email, Icons.email),
       // Divider(),
-      _createInput('Teléfono', 'Teléfono', _phoneController, _setphone,
-          Icons.share_sharp, Icons.phone_android_outlined),
+      _createInput(
+          'Teléfono',
+          'Teléfono',
+          'Introduzca el teléfono',
+          _phoneController,
+          _setphone,
+          _nonEmptyValidation,
+          Icons.share_sharp,
+          Icons.phone_android_outlined),
       Divider(),
-      _createInput('Dirección de domicilio', 'Dirección', _addressController,
-          _setEmail, Icons.share_sharp, Icons.edit_location),
+      _createInput(
+          'Dirección de domicilio',
+          'Dirección',
+          'Introduzca la dirección',
+          _addressController,
+          _setAddress,
+          _nonEmptyValidation,
+          Icons.share_sharp,
+          Icons.edit_location),
       Divider(),
       _createInputDate(context),
       Divider(),
@@ -148,13 +189,14 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _createInput(
       String hintText,
       String labelText,
+      String errorMessage,
       TextEditingController controller,
       Function onChangeFunction,
+      Function condition,
       IconData suffixIcon,
       IconData iconData) {
-    return TextField(
+    return TextFormField(
       controller: controller,
-      textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(
           counter: Text('${controller.text.length}'),
           hintText: hintText,
@@ -162,7 +204,25 @@ class _ProfilePageState extends State<ProfilePage> {
           suffixIcon: Icon(suffixIcon),
           icon: Icon(iconData)),
       onChanged: onChangeFunction,
+      validator: (value) {
+        if (condition(value)) {
+          return errorMessage;
+        }
+        return null;
+      },
     );
+
+    // return TextField(
+    //   controller: controller,
+    //   textCapitalization: TextCapitalization.sentences,
+    //   decoration: InputDecoration(
+    //       counter: Text('${controller.text.length}'),
+    //       hintText: hintText,
+    //       labelText: labelText,
+    //       suffixIcon: Icon(suffixIcon),
+    //       icon: Icon(iconData)),
+    //   onChanged: onChangeFunction,
+    // );
   }
 
   List<DropdownMenuItem<String>> _getOptionsDropdown() {
@@ -275,7 +335,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text('Guardar'),
                 onPressed: () {
                   Navigator.pop(context);
-                  _saveProfile(context);
+                  if (_formKey.currentState.validate()) {
+                    _saveProfile(context);
+                  }
                 },
               ),
               FlatButton(
@@ -346,6 +408,10 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _account.email = email);
   }
 
+  _setAddress(address) {
+    setState(() => _account.person.address = address);
+  }
+
   _setphone(phone) {
     setState(() => _account.person.phone = phone);
   }
@@ -358,5 +424,12 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _load = value;
     });
+  }
+
+  _nonEmptyValidation(String value) {
+    if (value.isNotEmpty)
+      return false;
+    else
+      return true;
   }
 }

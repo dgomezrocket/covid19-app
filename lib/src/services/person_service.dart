@@ -92,4 +92,18 @@ class PersonService {
       // done you can do something here
     }
   }
+
+  Future<dynamic> getHospitalsData() async {
+    try {
+      final String token = await AuthService.getTokenJwt();
+      final resp = await http.get(
+        '$baseUrl/hospitals/',
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+
+      return json.decode(utf8.decode(resp.bodyBytes));
+    } finally {
+      // done you can do something here
+    }
+  }
 }
