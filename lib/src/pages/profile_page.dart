@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
           status: Status(id: 0, name: '')),
       role: Role(id: 0, name: ''));
 
-  final dateFormat = DateFormat('dd/MM/yyyy');
+  final dateFormat = DateFormat(dateFormatString);
 
   final _formKey = GlobalKey<FormState>();
 

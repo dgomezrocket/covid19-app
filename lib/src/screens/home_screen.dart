@@ -1,3 +1,4 @@
+import 'package:covid19/src/pages/answers_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/pages/profile_page.dart';
@@ -18,6 +19,7 @@ class _HomeScreen extends State<Home> {
   final List<Widget> _screens = [
     ProfilePage(),
     FormsPage(),
+    AnswersPage(),
     OSMMap(), //LiveMap()
     //OtherMap()
   ];
@@ -59,6 +61,10 @@ class _HomeScreen extends State<Home> {
           BottomNavigationBarItem(
             icon: new Icon(Icons.assessment),
             title: Text('Formularios'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.assessment),
+            title: Text('Respuestas'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_location),

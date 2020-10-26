@@ -12,8 +12,8 @@ class Answer {
   Answer({this.id, this.form, this.answerDate, this.answers});
 
   factory Answer.fromJson(dynamic json) {
-    if (json['ItemsAnswer'] != null) {
-      var answersObjsJson = json['ItemsAnswer'] as List;
+    if (json['answers'] != null) {
+      var answersObjsJson = json['answers'] as List;
 
       List<ItemsAnswer> _answers = answersObjsJson
           .map((answer) => ItemsAnswer.fromJson(answer))
