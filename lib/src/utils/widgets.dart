@@ -5,3 +5,12 @@ createCircularProgressIndicator() {
     child: CircularProgressIndicator(),
   );
 }
+
+createLoader() {
+  return new Container(
+    child: new Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: createCircularProgressIndicator(),
+    ),
+  );
+}

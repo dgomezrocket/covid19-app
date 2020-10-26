@@ -33,6 +33,7 @@ class _ItemInputExpansibleState extends State<ItemInputExpansible> {
           title: ListTile(
             leading: Checkbox(
               value: widget.check,
+              onChanged: (bool value) {},
             ),
             title: Text(
               widget.item.title,

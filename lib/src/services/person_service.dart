@@ -2,13 +2,14 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:covid19/src/models/answer.dart';
+import 'package:covid19/src/models/person.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:covid19/src/utils/config.dart';
 import 'package:covid19/src/services/auth_service.dart';
 
 class PersonService {
-  Future<dynamic> loadPersonData() async {
+  Future<dynamic> getPersonData() async {
     try {
       final String token = await AuthService.getTokenJwt();
       final resp = await http.get(
@@ -17,6 +18,24 @@ class PersonService {
       );
 
       return json.decode(utf8.decode(resp.bodyBytes));
+    } finally {
+      // done you can do something here
+    }
+  }
+
+  Future<dynamic> putPersonData(Person person) async {
+    try {
+      final String token = await AuthService.getTokenJwt();
+      final resp = await http.put(
+        '$baseUrl/persons/',
+        body: jsonEncode(person.toJson()),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        },
+      );
+
+      return resp?.body;
     } finally {
       // done you can do something here
     }

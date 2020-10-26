@@ -26,6 +26,8 @@ class FormPage extends StatefulWidget {
 
 class _FormPageState extends State<FormPage> {
   bool _load = false;
+  Widget loadingIndicator;
+
   @override
   void initState() {
     widget.items = widget.form.itemsForm.map(_createFormList).toList();
@@ -34,15 +36,7 @@ class _FormPageState extends State<FormPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget loadingIndicator = !_load
-        ? new Container()
-        : new Container(
-            child: new Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: createCircularProgressIndicator(),
-            ),
-          );
-
+    loadingIndicator = !_load ? new Container() : createLoader();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.form.title),
@@ -92,14 +86,14 @@ class _FormPageState extends State<FormPage> {
         FlatButton(
           child: Text('Guardar'),
           onPressed: () {
-            _showAlert(context);
+            _showConfirmation(context);
           },
         ),
       ],
     );
   }
 
-  void _showAlert(BuildContext context) {
+  void _showConfirmation(BuildContext context) {
     showDialog(
         context: context,
         barrierDismissible: true,
@@ -142,7 +136,17 @@ class _FormPageState extends State<FormPage> {
         });
   }
 
-  Future<bool> _submitAnswer() async {
+  _saveAnswer(BuildContext context) async {
+    _showCircularProgressIndicator(true);
+    bool result = await _getAnswer();
+    _showCircularProgressIndicator(false);
+    if (result)
+      _launchAlert('Se guardaron exitosamente los datos.');
+    else
+      _launchAlert('Ocurrió un error al guardar los datos.');
+  }
+
+  Future<bool> _getAnswer() async {
     Answer answer = Answer(
       form: widget.form,
       answerDate: DateTime.now(),
@@ -164,16 +168,6 @@ class _FormPageState extends State<FormPage> {
     });
 
     return await profileProvider.postAnswer(answer);
-  }
-
-  _saveAnswer(BuildContext context) async {
-    _showCircularProgressIndicator(true);
-    bool result = await _submitAnswer();
-    _showCircularProgressIndicator(false);
-    if (result)
-      _launchAlert('Se guardaron exitosamente los datos.');
-    else
-      _launchAlert('Ocurrió un error al guardar los datos.');
   }
 
   _launchAlert(String result) {

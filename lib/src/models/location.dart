@@ -12,6 +12,9 @@ class Location {
         longitude: json['longitude'] as double);
   }
 
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'latitude': latitude, 'longitude': longitude};
+
   @override
   String toString() {
     return '{ ${this.id}, ${this.latitude}, ${this.longitude} }';

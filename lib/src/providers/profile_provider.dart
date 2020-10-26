@@ -14,9 +14,19 @@ class _ProfileProvider {
   final personService = PersonService();
 
   Future<Person> getPerson() async {
-    Map personMap = await personService.loadPersonData();
+    Map personMap = await personService.getPersonData();
 
     return Person.fromJson(personMap);
+  }
+
+  Future<bool> putPerson(Person person) async {
+    final res = await personService.putPersonData(person);
+    final data = jsonDecode(res) as Map<String, dynamic>;
+    if (data['id'] != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<List<FormPerson>> getForms() async {

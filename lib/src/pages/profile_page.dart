@@ -1,3 +1,4 @@
+import 'package:covid19/src/utils/styles_options.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/account.dart';
@@ -41,6 +42,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   List<String> _sexs = ['MASCULINO', 'FENEMINO'];
 
+  bool _load = false;
+  Widget loadingIndicator;
+
   // controllers for form text controllers
   CustomEditingController _documentController = new CustomEditingController();
   CustomEditingController _nameController = new CustomEditingController();
@@ -63,6 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    loadingIndicator = !_load ? new Container() : createLoader();
     return Container(
       child: _loadProfile(context),
     );
@@ -78,9 +83,17 @@ class _ProfilePageState extends State<ProfilePage> {
         } else {
           _loadData(snapshot.data);
 
-          return ListView(
-            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-            children: _createElements(),
+          return Stack(
+            children: [
+              ListView(
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                children: _createElements(),
+              ),
+              Align(
+                child: loadingIndicator,
+                alignment: FractionalOffset.center,
+              ),
+            ],
           );
         }
       },
@@ -124,6 +137,11 @@ class _ProfilePageState extends State<ProfilePage> {
       _createInputDate(context),
       Divider(),
       _createDropdown(),
+      Divider(),
+      SizedBox(
+        height: 20.0,
+      ),
+      _createSaveButton(context),
     ];
   }
 
@@ -208,6 +226,110 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _createSaveButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: RaisedButton(
+        onPressed: () {
+          _showConfirmation(context);
+        },
+        child: const Icon(Icons.arrow_forward),
+        color: Colors.amber,
+        clipBehavior: Clip.hardEdge,
+        elevation: 10,
+        disabledColor: Colors.blueGrey,
+        disabledElevation: 10,
+        disabledTextColor: Colors.white,
+      ),
+    );
+  }
+
+  void _showConfirmation(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            title: Row(
+              children: [
+                Icon(
+                  Icons.save,
+                  size: 30.0,
+                ),
+                Text('Confirmar'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  '¿Está seguro de que desea guardar?',
+                  locale: localES,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Guardar'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _saveProfile(context);
+                },
+              ),
+              FlatButton(
+                child: Text('Cancelar'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        });
+  }
+
+  _saveProfile(BuildContext context) async {
+    _showCircularProgressIndicator(true);
+    bool result = await _getPerson();
+    _showCircularProgressIndicator(false);
+    if (result)
+      _launchAlert('Se guardaron exitosamente los datos.');
+    else
+      _launchAlert('Ocurrió un error al guardar los datos.');
+  }
+
+  Future<bool> _getPerson() async {
+    return await profileProvider.putPerson(_account.person);
+  }
+
+  _launchAlert(String result) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  result,
+                  locale: localES,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   _setDocument(document) {
     setState(() => _account.person.document = document);
   }
@@ -230,5 +352,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   _setSex(sex) {
     setState(() => _account.person.sex = sex);
+  }
+
+  _showCircularProgressIndicator(bool value) {
+    setState(() {
+      _load = value;
+    });
   }
 }

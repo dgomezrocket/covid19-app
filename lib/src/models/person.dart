@@ -41,6 +41,19 @@ class Person {
         status: Status.fromJson(json['status']));
   }
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'document': document,
+        'name': name,
+        'lastname': lastname,
+        'birthDate': birthDate == null ? null : birthDate.toIso8601String(),
+        'phone': phone,
+        'sex': sex,
+        'address': address,
+        'location': location.toJson(),
+        'status': status.toJson()
+      };
+
   @override
   String toString() {
     return '{ ${this.id}, ${this.document}, ${this.name}, ${this.lastname}, ${this.birthDate}, ${this.phone}, ${this.sex}, ${this.address}, ${this.location}, ${this.status} }';
