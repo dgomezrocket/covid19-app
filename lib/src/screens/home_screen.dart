@@ -1,81 +1,110 @@
-import 'package:covid19/src/pages/answers_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/pages/profile_page.dart';
 import 'package:covid19/src/pages/forms_page.dart';
+import 'package:covid19/src/pages/answers_page.dart';
+import 'package:covid19/src/pages/message_page.dart';
+import 'package:covid19/src/models/person.dart';
+import 'package:covid19/src/providers/profile_provider.dart';
+import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/services/auth_service.dart';
 import 'package:covid19/src/pages/map_page.dart';
-// import 'package:covid19/src/pages/livemap_location.dart';
 
 class Home extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _HomeScreen();
-  }
-}
-
-class _HomeScreen extends State<Home> {
-  int _currentIndex = 0;
-  final List<Widget> _screens = [
+  final List<Widget> screens = [
     ProfilePage(),
     FormsPage(),
     AnswersPage(),
-    OSMMap(), //LiveMap()
-    //OtherMap()
+    OSMMap(),
+    MessagePage()
   ];
 
   @override
+  State<StatefulWidget> createState() {
+    return _HomeState();
+  }
+}
+
+class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+  Future<Person> _personFetched;
+
+  @override
+  void initState() {
+    _personFetched = profileProvider.getPerson();
+    return super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(children: [
-          Text('Conacyt App'),
-          Expanded(
-              child: SizedBox(
-            width: 5.0,
-          )),
-          GestureDetector(
-              child: Text("Salir",
-                  style: TextStyle(
-                    fontSize: 10.0,
-                    decoration: TextDecoration.underline,
-                  )),
-              onTap: () {
-                _logout(context);
-              }),
-        ]),
-      ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: onTabTapped,
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.blue,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            title: Text('Datos'),
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.assessment),
-            title: Text('Formularios'),
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.assessment),
-            title: Text('Respuestas'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_location),
-            title: Text('Hospitales'),
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.mail),
-            title: Text('Mensajes'),
-          ),
-        ],
-      ),
+    return FutureBuilder(
+      future: _personFetched,
+      initialData: null,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return createCircularProgressIndicator();
+        } else {
+          return Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: Row(children: [
+                Text('Conacyt App'),
+                Expanded(
+                    child: SizedBox(
+                  width: 5.0,
+                )),
+                GestureDetector(
+                    child: Text("Salir",
+                        style: TextStyle(
+                          fontSize: 10.0,
+                          decoration: TextDecoration.underline,
+                        )),
+                    onTap: () {
+                      _logout(context);
+                    }),
+              ]),
+            ),
+            body: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: widget.screens[_currentIndex],
+            ),
+            bottomNavigationBar:
+                snapshot.hasData ? _createBottomNavigationBar() : null,
+          );
+        }
+      },
+    );
+  }
+
+  _createBottomNavigationBar() {
+    return BottomNavigationBar(
+      onTap: onTabTapped,
+      currentIndex: _currentIndex,
+      selectedItemColor: Colors.blue,
+      unselectedItemColor: Colors.grey,
+      backgroundColor: Colors.blue,
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          title: Text('Datos'),
+        ),
+        BottomNavigationBarItem(
+          icon: new Icon(Icons.assessment),
+          title: Text('Formularios'),
+        ),
+        BottomNavigationBarItem(
+          icon: new Icon(Icons.assessment),
+          title: Text('Respuestas'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.add_location),
+          title: Text('Hospitales'),
+        ),
+        BottomNavigationBarItem(
+          icon: new Icon(Icons.mail),
+          title: Text('Mensajes'),
+        ),
+      ],
     );
   }
 

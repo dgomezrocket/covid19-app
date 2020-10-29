@@ -1,8 +1,8 @@
-import 'package:covid19/src/options/form_item.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/form.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
+import 'package:covid19/src/options/form_item.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/widgets.dart';
 
@@ -36,7 +36,7 @@ class _FormsPageState extends State<FormsPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
-        } else {
+        } else if (snapshot.hasData) {
           _loadData(snapshot.data);
 
           return ListView(

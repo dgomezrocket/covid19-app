@@ -13,29 +13,25 @@ class SignupScreen extends StatelessWidget {
     final FormBloc formBloc = Provider.of(context);
 
     return Scaffold(
-      body: Center(
-        child: Container(
-          margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
-          height: 550.0,
-          child: Form(
-            child: Column(
-              children: <Widget>[
-                _emailField(formBloc),
-                _passwordField(formBloc),
-                Container(
-                  width: 300,
-                  height: 35,
-                  child: Helper().errorMessage(formBloc),
-                ),
-                _buttonField(formBloc),
-                // GestureDetector(
-                //   onTap: () => Navigator.pushNamed(context, '/forgot_password'),
-                //   child: Container(
-                //     child: Text('Forgot password?'),
-                //     alignment: Alignment.bottomLeft,
-                //   ),
-                // ),
-              ],
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
+            height: 550.0,
+            child: Form(
+              child: Column(
+                children: <Widget>[
+                  _emailField(formBloc),
+                  _passwordField(formBloc),
+                  Container(
+                    width: 300,
+                    height: 35,
+                    child: Helper().errorMessage(formBloc),
+                  ),
+                  _buttonField(formBloc),
+                ],
+              ),
             ),
           ),
         ),
@@ -87,7 +83,6 @@ class SignupScreen extends StatelessWidget {
                 if (snapshot.hasError) {
                   return null;
                 }
-                Navigator.popAndPushNamed(context, '/login');
                 return bloc.register(context);
               },
               child: const Icon(Icons.arrow_forward),

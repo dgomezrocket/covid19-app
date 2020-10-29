@@ -1,8 +1,8 @@
-import 'package:covid19/src/options/answer_expansible.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/answer.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
+import 'package:covid19/src/options/answer_expansible.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/widgets.dart';
 
@@ -36,7 +36,7 @@ class _AnswersPageState extends State<AnswersPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
-        } else {
+        } else if (snapshot.hasData) {
           _loadData(snapshot.data);
 
           return AnswerExpansible(answers: _answers);

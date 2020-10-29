@@ -10,6 +10,8 @@ import 'package:covid19/src/services/person_service.dart';
 import 'package:covid19/src/models/form.dart';
 import 'package:covid19/src/models/answer.dart';
 import 'package:covid19/src/models/hospital_response.dart';
+import 'package:covid19/src/models/message.dart';
+import 'package:covid19/src/models/message_response.dart';
 
 class _ProfileProvider {
   final personService = PersonService();
@@ -67,6 +69,22 @@ class _ProfileProvider {
     Map hospitalsMap = await personService.getHospitalsData();
 
     return HospitalResponse.fromJson(hospitalsMap);
+  }
+
+  Future<MessageResponse> getMessages() async {
+    Map messagesMap = await personService.getMessagesData();
+
+    return MessageResponse.fromJson(messagesMap);
+  }
+
+  Future<bool> postMessage(Message message) async {
+    final res = await personService.postMessageData(message);
+    final data = jsonDecode(res) as Map<String, dynamic>;
+    if (data['status'] == null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 

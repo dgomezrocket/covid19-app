@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/models/answer.dart';
 import 'package:covid19/src/models/items_answer.dart';
 import 'package:covid19/src/utils/styles_options.dart';
-import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/util_constants.dart';
 import 'package:intl/intl.dart';
 

@@ -1,4 +1,3 @@
-import 'package:covid19/src/utils/styles_options.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/models/account.dart';
@@ -11,6 +10,7 @@ import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/utils/util_classes.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/util_constants.dart';
+import 'package:covid19/src/utils/styles_options.dart';
 import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -34,15 +34,15 @@ class _ProfilePageState extends State<ProfilePage> {
           phone: '',
           sex: 'MASCULINO',
           address: '',
-          location: Location(id: 0, latitude: 0.0, longitude: 0.0),
-          status: Status(id: 0, name: '')),
+          location: Location(latitude: 0.0, longitude: 0.0),
+          status: Status(name: 'HEALTHY')),
       role: Role(id: 0, name: ''));
 
   final dateFormat = DateFormat(dateFormatString);
 
   final _formKey = GlobalKey<FormState>();
 
-  List<String> _sexs = ['MASCULINO', 'FENEMINO'];
+  List<String> _sexs = ['MASCULINO', 'FEMENINO'];
 
   bool _load = false;
   Widget loadingIndicator;
@@ -288,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               width: 5.0,
             ),
-            Text('Guardar'), // : Color(Colors.white),)
+            Text('Guardar'),
           ],
         ),
       ),
@@ -357,7 +357,7 @@ class _ProfilePageState extends State<ProfilePage> {
   _launchAlert(String result) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
@@ -376,6 +376,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
+                  Navigator.pushNamed(context, '/home');
                 },
               ),
             ],

@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:covid19/src/models/answer.dart';
-import 'package:covid19/src/models/person.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:covid19/src/models/answer.dart';
+import 'package:covid19/src/models/message.dart';
+import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/utils/config.dart';
 import 'package:covid19/src/services/auth_service.dart';
 
@@ -102,6 +103,38 @@ class PersonService {
       );
 
       return json.decode(utf8.decode(resp.bodyBytes));
+    } finally {
+      // done you can do something here
+    }
+  }
+
+  Future<dynamic> getMessagesData() async {
+    try {
+      final String token = await AuthService.getTokenJwt();
+      final resp = await http.get(
+        '$baseUrl/messages/',
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+
+      return json.decode(utf8.decode(resp.bodyBytes));
+    } finally {
+      // done you can do something here
+    }
+  }
+
+  Future<dynamic> postMessageData(Message message) async {
+    try {
+      final String token = await AuthService.getTokenJwt();
+      var resp = await http.post(
+        '$baseUrl/messages/',
+        body: jsonEncode(message.toJson()),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
+
+      return resp?.body;
     } finally {
       // done you can do something here
     }
