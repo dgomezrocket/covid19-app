@@ -61,7 +61,8 @@ class _MessagePageState extends State<MessagePage> {
               ],
             ),
           );
-        }
+        } else
+          return Container();
       },
     );
   }

@@ -27,9 +27,12 @@ class _OSMMapState extends State<OSMMap> {
       future: _hospitalsFetched,
       initialData: null,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting)
           return createCircularProgressIndicator();
-        } else if (snapshot.hasData) return _createMap(snapshot.data);
+        else if (snapshot.hasData)
+          return _createMap(snapshot.data);
+        else
+          return Container();
       },
     );
   }

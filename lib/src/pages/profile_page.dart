@@ -11,6 +11,9 @@ import 'package:covid19/src/utils/util_classes.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/util_constants.dart';
 import 'package:covid19/src/utils/styles_options.dart';
+import 'package:covid19/src/pages/livemap_location.dart';
+
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -34,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
           phone: '',
           sex: 'MASCULINO',
           address: '',
-          location: Location(latitude: 0.0, longitude: 0.0),
+          location: null,
           status: Status(name: 'HEALTHY')),
       role: Role(id: 0, name: ''));
 
@@ -165,15 +168,23 @@ class _ProfilePageState extends State<ProfilePage> {
           Icons.share_sharp,
           Icons.phone_android_outlined),
       Divider(),
-      _createInput(
-          'Dirección de domicilio',
-          'Dirección',
-          'Introduzca la dirección',
-          _addressController,
-          _setAddress,
-          _nonEmptyValidation,
-          Icons.share_sharp,
-          Icons.edit_location),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            child: _createInput(
+                'Dirección de domicilio',
+                'Dirección',
+                'Introduzca la dirección y localización',
+                _addressController,
+                _setAddress,
+                _nonEmptyAddress,
+                null,
+                Icons.edit_location),
+          ),
+          _createLocationButton(),
+        ],
+      ),
       Divider(),
       _createInputDate(context),
       Divider(),
@@ -211,6 +222,25 @@ class _ProfilePageState extends State<ProfilePage> {
         return null;
       },
     );
+  }
+
+  Widget _createLocationButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        _getLocationFromLiveMapPage();
+      },
+      child: Icon(Icons.add_location),
+    );
+  }
+
+  _getLocationFromLiveMapPage() async {
+    Position positionResult = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LiveMap(),
+        ));
+    _account.person.location = Location(
+        latitude: positionResult.latitude, longitude: positionResult.longitude);
   }
 
   List<DropdownMenuItem<String>> _getOptionsDropdown() {
@@ -422,6 +452,13 @@ class _ProfilePageState extends State<ProfilePage> {
     if (value.isNotEmpty)
       return false;
     else
+      return true;
+  }
+
+  _nonEmptyAddress(String value) {
+    if (value.isNotEmpty && _account.person.location != null) {
+      return false;
+    } else
       return true;
   }
 }

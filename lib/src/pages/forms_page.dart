@@ -42,7 +42,8 @@ class _FormsPageState extends State<FormsPage> {
           return ListView(
             children: _forms.map(_createElements).toList(),
           );
-        }
+        } else
+          return Container();
       },
     );
   }

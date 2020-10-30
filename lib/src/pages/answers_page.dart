@@ -40,7 +40,8 @@ class _AnswersPageState extends State<AnswersPage> {
           _loadData(snapshot.data);
 
           return AnswerExpansible(answers: _answers);
-        }
+        } else
+          return Container();
       },
     );
   }
