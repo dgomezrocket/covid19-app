@@ -149,8 +149,10 @@ class _MessagePageState extends State<MessagePage> {
     DateTime date = null;
     _messageResponse.messages.forEach((messageItem) {
       if (_messageResponse.myData.id != messageItem.person.id &&
-          (date == null || date.compareTo(messageItem.messageDate) < 0))
+          (date == null || date.isBefore(messageItem.messageDate))) {
         idSender = messageItem.id;
+        date = messageItem.messageDate;
+      }
     });
     return idSender;
   }
