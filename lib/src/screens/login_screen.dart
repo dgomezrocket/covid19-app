@@ -4,63 +4,82 @@ import 'package:covid19/src/mixins/helper.dart';
 
 import 'package:covid19/src/blocs/form_bloc.dart';
 import 'package:covid19/src/providers/provider.dart';
+import 'package:covid19/src/utils/widgets.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   // single approch way
   // final bloc = new FormBloc();
 
   @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _load = false;
+
+  Widget loadingIndicator;
+
+  @override
   Widget build(BuildContext context) {
     final FormBloc formBloc = Provider.of(context);
+    loadingIndicator = !_load ? new Container() : createLoader();
 
     return Scaffold(
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Container(
-              margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
-              height: 550.0,
-              child: Form(
-                child: Column(
-                  children: <Widget>[
-                    _emailField(formBloc),
-                    _passwordField(formBloc),
-                    Container(
-                      width: 300,
-                      height: 35,
-                      child: Helper().errorMessage(formBloc),
-                    ),
-                    //_checkBox(),
-                    _buttonField(formBloc),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () =>
-                              Navigator.pushNamed(context, '/forgot_password'),
-                          child: Container(
-                            child: Text('Olvidaste la contraseña?'),
-                            alignment: Alignment.bottomLeft,
+        body: Stack(
+      children: [
+        GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
+            child: Center(
+              child: Container(
+                margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
+                height: 550.0,
+                child: Form(
+                  child: Column(
+                    children: <Widget>[
+                      _emailField(formBloc),
+                      _passwordField(formBloc),
+                      Container(
+                        width: 300,
+                        height: 35,
+                        child: Helper().errorMessage(formBloc),
+                      ),
+                      //_checkBox(),
+                      _buttonField(formBloc),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pushNamed(
+                                context, '/forgot_password'),
+                            child: Container(
+                              child: Text('Olvidaste la contraseña?'),
+                              alignment: Alignment.bottomLeft,
+                            ),
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, '/signup'),
-                          child: Container(
-                            child: Text('Registrarse'),
-                            alignment: Alignment.bottomLeft,
+                          GestureDetector(
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/signup'),
+                            child: Container(
+                              child: Text('Registrarse'),
+                              alignment: Alignment.bottomLeft,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+        Align(
+          child: loadingIndicator,
+          alignment: FractionalOffset.center,
+        ),
+      ],
+    ));
   }
 
   Widget _emailField(FormBloc bloc) {
@@ -120,7 +139,9 @@ class LoginScreen extends StatelessWidget {
                   print(snapshot.error);
                   return null;
                 }
+                _showCircularProgressIndicator(true);
                 bloc.login(context);
+                _showCircularProgressIndicator(false);
               },
               child: const Icon(Icons.arrow_forward),
               color: Colors.amber,
@@ -132,5 +153,11 @@ class LoginScreen extends StatelessWidget {
             ),
           );
         });
+  }
+
+  _showCircularProgressIndicator(bool value) {
+    setState(() {
+      _load = value;
+    });
   }
 }
