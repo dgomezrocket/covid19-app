@@ -1,4 +1,5 @@
 import 'package:covid19/src/models/location.dart';
+import 'package:covid19/src/models/province.dart';
 import 'package:covid19/src/models/status.dart';
 
 class Person {
@@ -12,6 +13,7 @@ class Person {
   String address;
   Location location;
   Status status;
+  Province province;
 
   Person(
       {this.id,
@@ -23,7 +25,8 @@ class Person {
       this.sex,
       this.address,
       this.location,
-      this.status});
+      this.status,
+      this.province});
 
   factory Person.fromJson(dynamic json) {
     return Person(
@@ -38,7 +41,8 @@ class Person {
         sex: json['sex'] as String,
         address: json['address'] as String,
         location: Location.fromJson(json['location']),
-        status: Status.fromJson(json['status']));
+        status: Status.fromJson(json['status']),
+        province: Province.fromJson(json['province']));
   }
 
   Map<String, dynamic> toJson() => {
@@ -51,11 +55,12 @@ class Person {
         'sex': sex,
         'address': address,
         'location': location.toJson(),
-        'status': status.toJson()
+        'status': status.toJson(),
+        'province': province.toJson()
       };
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.document}, ${this.name}, ${this.lastname}, ${this.birthDate}, ${this.phone}, ${this.sex}, ${this.address}, ${this.location}, ${this.status} }';
+    return '{ ${this.id}, ${this.document}, ${this.name}, ${this.lastname}, ${this.birthDate}, ${this.phone}, ${this.sex}, ${this.address}, ${this.location}, ${this.status}, ${this.province} }';
   }
 }

@@ -139,4 +139,21 @@ class PersonService {
       // done you can do something here
     }
   }
+
+  Future<dynamic> getProvinces() async {
+    try {
+      final String token = await AuthService.getTokenJwt();
+      var resp = await http.get(
+        '$baseUrl/provinces/',
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
+
+      return json.decode(utf8.decode(resp.bodyBytes));
+    } finally {
+      // done you can do something here
+    }
+  }
 }

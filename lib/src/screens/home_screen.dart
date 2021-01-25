@@ -48,7 +48,7 @@ class _HomeState extends State<Home> {
             appBar: AppBar(
               automaticallyImplyLeading: false,
               title: Row(children: [
-                Text('Conacyt App'),
+                Text('CroniApp'),
                 Expanded(
                     child: SizedBox(
                   width: 5.0,
