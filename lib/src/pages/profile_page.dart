@@ -5,6 +5,7 @@ import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/models/role.dart';
 import 'package:covid19/src/models/location.dart';
 import 'package:covid19/src/models/status.dart';
+import 'package:covid19/src/models/province.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
 import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/utils/util_classes.dart';
@@ -25,6 +26,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Future<Person> _personFetched;
+  List<Province> _provinces;
   Account _account = Account(
       id: 0,
       email: '',
@@ -38,7 +40,8 @@ class _ProfilePageState extends State<ProfilePage> {
           sex: 'MASCULINO',
           address: '',
           location: null,
-          status: Status(name: 'HEALTHY')),
+          status: Status(name: 'HEALTHY'),
+          province: Province(name: 'Asunción')),
       role: Role(id: 0, name: ''));
 
   final dateFormat = DateFormat(dateFormatString);
@@ -60,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    _personFetched = profileProvider.getPerson();
+    _personFetched = _loadAsynchronousData();
     _documentController.text = '';
     _nameController.text = '';
     _lastnameController.text = '';
@@ -86,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
         } else {
-          _loadData(snapshot.data);
+          _loadPersonData(snapshot.data);
 
           return Stack(
             children: [
@@ -109,9 +112,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  _loadData(dynamic data) {
+  _loadPersonData(dynamic data) {
     if (data != null) {
       _account.person = cast<Person>(data);
+      if (_account.person.province == null) {
+        _account.person.province = _provinces[0];
+      }
       _documentController.text = _account.person.document;
       _nameController.text = _account.person.name;
       _lastnameController.text = _account.person.lastname;
@@ -120,7 +126,14 @@ class _ProfilePageState extends State<ProfilePage> {
           : dateFormat.format(DateTime.now());
       _phoneController.text = _account.person.phone;
       _addressController.text = _account.person.address;
+    } else {
+      _account.person.province = _provinces[0];
     }
+  }
+
+  Future<Person> _loadAsynchronousData() async {
+    _provinces = await profileProvider.getProvices();
+    return profileProvider.getPerson();
   }
 
   List<Widget> _createElements() {
@@ -186,9 +199,11 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       Divider(),
+      _createDropdown(_account.person.province.name, _provinces, _setProvince),
+      Divider(),
       _createInputDate(context),
       Divider(),
-      _createDropdown(),
+      _createDropdown(_account.person.sex, _sexs, _setSex),
       Divider(),
       SizedBox(
         height: 20.0,
@@ -243,12 +258,12 @@ class _ProfilePageState extends State<ProfilePage> {
         latitude: positionResult.latitude, longitude: positionResult.longitude);
   }
 
-  List<DropdownMenuItem<String>> _getOptionsDropdown() {
+  List<DropdownMenuItem<String>> _getOptionsDropdown(List<dynamic> options) {
     List<DropdownMenuItem<String>> list = new List();
-    _sexs.forEach((sex) {
+    options.forEach((option) {
       list.add(DropdownMenuItem(
-        child: Text(sex),
-        value: sex,
+        child: Text((option is String) ? option : option.name),
+        value: (option is String) ? option : option.name,
       ));
     });
 
@@ -288,16 +303,17 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Widget _createDropdown() {
+  Widget _createDropdown(
+      String value, List<dynamic> options, Function onChangeFunction) {
     return Row(
       children: <Widget>[
         Icon(Icons.select_all),
         SizedBox(width: 30.0),
         Expanded(
           child: DropdownButton(
-            value: _account.person.sex,
-            items: _getOptionsDropdown(),
-            onChanged: _setSex,
+            value: value,
+            items: _getOptionsDropdown(options),
+            onChanged: onChangeFunction,
           ),
         )
       ],
@@ -440,6 +456,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   _setSex(sex) {
     setState(() => _account.person.sex = sex);
+  }
+
+  _setProvince(String province) {
+    setState(() => _account.person.province = (_provinces == null)
+        ? Province(name: 'Asunción')
+        : _provinces
+            .where((provinceItem) => provinceItem.name == province)
+            .toList()[0]);
   }
 
   _showCircularProgressIndicator(bool value) {

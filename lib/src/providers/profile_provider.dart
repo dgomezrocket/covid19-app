@@ -12,6 +12,7 @@ import 'package:covid19/src/models/answer.dart';
 import 'package:covid19/src/models/hospital_response.dart';
 import 'package:covid19/src/models/message.dart';
 import 'package:covid19/src/models/message_response.dart';
+import 'package:covid19/src/models/province.dart';
 
 class _ProfileProvider {
   final personService = PersonService();
@@ -85,6 +86,16 @@ class _ProfileProvider {
     } else {
       return false;
     }
+  }
+
+  Future<List<Province>> getProvices() async {
+    List<dynamic> provincesObjsJson = await personService.getProvinces();
+
+    List<Province> provinces = provincesObjsJson
+        .map((provinceJson) => Province.fromJson(provinceJson))
+        .toList();
+
+    return provinces;
   }
 }
 
