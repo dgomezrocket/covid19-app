@@ -139,9 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   print(snapshot.error);
                   return null;
                 }
-                _showCircularProgressIndicator(true);
-                bloc.login(context);
-                _showCircularProgressIndicator(false);
+                _login(bloc, context);
               },
               child: const Icon(Icons.arrow_forward),
               color: Colors.amber,
@@ -153,6 +151,19 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         });
+  }
+
+  _login(FormBloc bloc, BuildContext context) async {
+    _showCircularProgressIndicator(true);
+    Map<String, dynamic> result = await bloc.login(context);
+    _showCircularProgressIndicator(false);
+
+    if (result['status'] != null) {
+      await Future.delayed(Duration(milliseconds: 100));
+      bloc.addError(result['message']);
+    } else {
+      Navigator.pushNamed(context, '/home');
+    }
   }
 
   _showCircularProgressIndicator(bool value) {

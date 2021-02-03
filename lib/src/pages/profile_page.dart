@@ -254,8 +254,11 @@ class _ProfilePageState extends State<ProfilePage> {
         MaterialPageRoute(
           builder: (context) => LiveMap(),
         ));
-    _account.person.location = Location(
-        latitude: positionResult.latitude, longitude: positionResult.longitude);
+    if (positionResult != null) {
+      _account.person.location = Location(
+          latitude: positionResult.latitude,
+          longitude: positionResult.longitude);
+    }
   }
 
   List<DropdownMenuItem<String>> _getOptionsDropdown(List<dynamic> options) {
