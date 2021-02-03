@@ -14,7 +14,7 @@ class ValidationMixin {
       //   sink.add(email);
       // }
       if (ValidationMixin()._validateEmail(email)) {
-        sink.addError('Emmail is not valid');
+        sink.addError('El correo no es válido!');
       } else {
         sink.add(email);
       }
@@ -24,7 +24,7 @@ class ValidationMixin {
   final validatorPassword = new StreamTransformer<String, String>.fromHandlers(
     handleData: (password, sink) {
       if (!ValidationMixin()._validatePassword(password)) {
-        sink.addError('Password is not valid!');
+        sink.addError('La contraseña no es válida!');
       } else {
         sink.add(password);
       }

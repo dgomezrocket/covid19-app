@@ -1,6 +1,4 @@
-import 'package:covid19/src/models/message.dart';
 import 'package:covid19/src/models/message_item.dart';
-import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 import 'package:covid19/src/utils/util_constants.dart';
 import 'package:flutter/material.dart';
@@ -8,18 +6,14 @@ import 'package:intl/intl.dart';
 
 class MessageBox extends StatefulWidget {
   List<MessageItem> messages;
-  MessageBoxState state;
 
   MessageBox({this.messages});
 
   @override
-  MessageBoxState createState() {
-    this.state = MessageBoxState();
-    return this.state;
-  }
+  _MessageBoxState createState() => _MessageBoxState();
 }
 
-class MessageBoxState extends State<MessageBox> {
+class _MessageBoxState extends State<MessageBox> {
   final _dateFormat = DateFormat(dateFormatWithHourString);
   List<Widget> messageBoxes;
 
@@ -28,9 +22,9 @@ class MessageBoxState extends State<MessageBox> {
     messageBoxes = widget.messages.map(_buildMessage).toList();
     return Container(
       child: ListView(
-        reverse: false,
+        reverse: true,
         padding: EdgeInsets.only(top: 15.0),
-        children: messageBoxes,
+        children: messageBoxes.reversed.toList(),
       ),
     );
   }
@@ -90,18 +84,5 @@ class MessageBoxState extends State<MessageBox> {
         ],
       ),
     );
-  }
-
-  addMessage(Message message, Person sender) {
-    MessageItem messageItem = MessageItem(
-        id: message.id,
-        messageText: message.messageText,
-        messageDate: message.sendDate,
-        person: sender,
-        receiver: true);
-    setState(() {
-      widget.messages.add(messageItem);
-      messageBoxes.add(_buildMessage(messageItem));
-    });
   }
 }

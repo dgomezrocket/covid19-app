@@ -46,7 +46,7 @@ class PersonService {
     try {
       final String token = await AuthService.getTokenJwt();
       var resp = await http.get(
-        '$baseUrl/forms/',
+        '$baseUrl/forms/my',
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token',

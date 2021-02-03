@@ -38,34 +38,22 @@ class FormBloc with ValidationMixin {
 
   //var authInfo;
   // rgister
-  dynamic register(BuildContext context) async {
+  Future<Map<String, dynamic>> register(BuildContext context) async {
     final authInfo = AuthService();
 
     final res = await authInfo.register(_email.value, _password.value);
     final data = jsonDecode(res) as Map<String, dynamic>;
-    if (data['status'] != null) {
-      addError(data['message']);
-    } else {
-      //AuthService.setToken(data['token']);
-      Navigator.pushNamed(context, '/login');
-      return data;
-    }
+    return data;
   }
 
   // login
-  dynamic login(BuildContext context) async {
+  Future<Map<String, dynamic>> login(BuildContext context) async {
     final authInfo = AuthService();
 
     final res = await authInfo.login(_email.value, _password.value);
     final data = jsonDecode(res) as Map<String, dynamic>;
 
-    if (data['jwt'] == null) {
-      addError(data['message']);
-    } else {
-      AuthService.setToken(data['jwt']);
-      Navigator.pushNamed(context, '/home');
-      return data;
-    }
+    return data;
   }
 
   // close streams

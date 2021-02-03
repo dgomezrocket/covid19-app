@@ -97,7 +97,9 @@ class _MessagePageState extends State<MessagePage> {
               controller: _controller,
               textCapitalization: TextCapitalization.sentences,
               onChanged: (value) {
-                _messageWrote = value;
+                setState(() {
+                  _messageWrote = value;
+                });
               },
               decoration: InputDecoration.collapsed(
                 hintText: 'Escriba un mensaje...',
@@ -110,17 +112,16 @@ class _MessagePageState extends State<MessagePage> {
             icon: Icon(Icons.send),
             iconSize: 25.0,
             color: Theme.of(context).primaryColor,
-            onPressed: () {
-              //guardar mensaje en back
-              _saveMessage();
-            },
+            onPressed: (_messageWrote.isEmpty)
+                ? null
+                : _saveMessage, //guardar mensaje en back
           ),
         ],
       ),
     );
   }
 
-  _saveMessage() {
+  _saveMessage() async {
     _showCircularProgressIndicator(true);
     int receiverId = _getSenderId();
     Message messageToSend = Message(
@@ -129,9 +130,9 @@ class _MessagePageState extends State<MessagePage> {
       personSenderId: _messageResponse.myData.id,
       sendDate: DateTime.now(),
     );
-    profileProvider.postMessage(messageToSend);
+    await profileProvider.postMessage(messageToSend);
     setState(() {
-      _messageBox.state.addMessage(messageToSend, _messageResponse.myData);
+      _messagesFetched = _buildMessagePage();
       _messageWrote = '';
       _controller.clear();
     });
