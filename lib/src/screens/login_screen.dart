@@ -157,13 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _showCircularProgressIndicator(true);
     Map<String, dynamic> result = await bloc.login(context);
     _showCircularProgressIndicator(false);
-
-    if (result['status'] != null) {
-      await Future.delayed(Duration(milliseconds: 100));
-      bloc.addError(result['message']);
-    } else {
-      Navigator.pushNamed(context, '/home');
-    }
+    bloc.treatLoginResult(result, context);
   }
 
   _showCircularProgressIndicator(bool value) {

@@ -90,7 +90,6 @@ class _ProfileProvider {
 
   Future<List<Province>> getProvices() async {
     List<dynamic> provincesObjsJson = await personService.getProvinces();
-
     List<Province> provinces = provincesObjsJson
         .map((provinceJson) => Province.fromJson(provinceJson))
         .toList();

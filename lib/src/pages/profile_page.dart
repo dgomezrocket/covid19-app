@@ -178,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _phoneController,
           _setphone,
           _nonEmptyValidation,
-          Icons.share_sharp,
+          Icons.accessibility,
           Icons.phone_android_outlined),
       Divider(),
       Row(

@@ -46,6 +46,16 @@ class FormBloc with ValidationMixin {
     return data;
   }
 
+  treatRegisterRestult(
+      Map<String, dynamic> result, BuildContext context) async {
+    if (result['status'] != null) {
+      await Future.delayed(Duration(milliseconds: 100));
+      addError(result['message']);
+    } else {
+      Navigator.pushNamed(context, '/login');
+    }
+  }
+
   // login
   Future<Map<String, dynamic>> login(BuildContext context) async {
     final authInfo = AuthService();
@@ -54,6 +64,16 @@ class FormBloc with ValidationMixin {
     final data = jsonDecode(res) as Map<String, dynamic>;
 
     return data;
+  }
+
+  treatLoginResult(Map<String, dynamic> result, BuildContext context) async {
+    if (result['status'] != null) {
+      await Future.delayed(Duration(milliseconds: 100));
+      addError(result['message']);
+    } else {
+      AuthService.setToken(result['jwt']);
+      Navigator.pushNamed(context, '/home');
+    }
   }
 
   // close streams
