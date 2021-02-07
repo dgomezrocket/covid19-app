@@ -52,8 +52,10 @@ class AuthService {
   }
 
   static getTokenJwt() async {
-    dynamic tokenMap = (await SESSION.get('token'));
-    return tokenMap['jwt'];
+    if (SESSION.prefs.containsKey('token')) {
+      return (await SESSION.get('token'))['jwt'];
+    } else
+      return null;
   }
 }
 

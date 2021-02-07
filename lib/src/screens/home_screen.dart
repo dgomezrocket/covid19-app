@@ -1,3 +1,4 @@
+import 'package:covid19/src/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:covid19/src/pages/profile_page.dart';
@@ -6,6 +7,7 @@ import 'package:covid19/src/pages/answers_page.dart';
 import 'package:covid19/src/pages/message_page.dart';
 import 'package:covid19/src/models/person.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
+import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/services/auth_service.dart';
 import 'package:covid19/src/pages/map_page.dart';
@@ -28,11 +30,20 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
   Future<Person> _personFetched;
+  bool _isLogged = false;
 
   @override
   void initState() {
-    _personFetched = profileProvider.getPerson();
+    _personFetched = _loadData();
     return super.initState();
+  }
+
+  Future<Person> _loadData() async {
+    _isLogged = await isLoggedUser();
+    if (_isLogged)
+      return profileProvider.getPerson();
+    else
+      return null;
   }
 
   @override
@@ -43,36 +54,42 @@ class _HomeState extends State<Home> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
+        } else if (_isLogged) {
+          return _loadHome(snapshot);
         } else {
-          return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Row(children: [
-                Text('CroniApp'),
-                Expanded(
-                    child: SizedBox(
-                  width: 5.0,
-                )),
-                GestureDetector(
-                    child: Text("Salir",
-                        style: TextStyle(
-                          fontSize: 10.0,
-                          decoration: TextDecoration.underline,
-                        )),
-                    onTap: () {
-                      _logout(context);
-                    }),
-              ]),
-            ),
-            body: GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: widget.screens[_currentIndex],
-            ),
-            bottomNavigationBar:
-                snapshot.hasData ? _createBottomNavigationBar() : null,
-          );
+          return LoginScreen();
         }
       },
+    );
+  }
+
+  _loadHome(AsyncSnapshot<dynamic> snapshot) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(children: [
+          Text('CroniApp'),
+          Expanded(
+              child: SizedBox(
+            width: 5.0,
+          )),
+          GestureDetector(
+              child: Text("Salir",
+                  style: TextStyle(
+                    fontSize: 10.0,
+                    decoration: TextDecoration.underline,
+                  )),
+              onTap: () {
+                _logout(context);
+              }),
+        ]),
+      ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: widget.screens[_currentIndex],
+      ),
+      bottomNavigationBar:
+          snapshot.hasData ? _createBottomNavigationBar() : null,
     );
   }
 

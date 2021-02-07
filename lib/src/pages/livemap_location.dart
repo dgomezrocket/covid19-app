@@ -17,6 +17,7 @@ class _LiveMapState extends State<LiveMap> {
       latitude: -25.2819, longitude: -57.635); // Asuncion location by default
   LatLng _latLngPosition;
   double _mapZoom = 15.0;
+  List<LayerOptions> _layers;
 
   LocationPermission _permission;
   int _amountOfRequestPermission = 3;
@@ -83,6 +84,7 @@ class _LiveMapState extends State<LiveMap> {
   }
 
   _createBody() {
+    _createMarkerForPosition();
     return Stack(
       children: <Widget>[
         _createMap(),
@@ -101,21 +103,21 @@ class _LiveMapState extends State<LiveMap> {
         center: _latLngPosition,
         zoom: _mapZoom,
       ),
-      layers: _createMarkerForPosition(),
+      layers: _layers,
     );
   }
 
   _createMarkerForPosition() {
-    final List<LayerOptions> layers = [];
+    _layers = [];
 
     TileLayerOptions tileLayerOptions = TileLayerOptions(
       urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       subdomains: ['a', 'b', 'c'],
     );
 
-    layers..add(tileLayerOptions)..add(_createMarker());
+    _layers..add(tileLayerOptions)..add(_createMarker());
 
-    return layers;
+    return _layers;
   }
 
   _createMarker() {
@@ -140,6 +142,7 @@ class _LiveMapState extends State<LiveMap> {
       position = newPosition;
       _latLngPosition = LatLng(position.latitude, position.longitude);
       _mapController.move(_latLngPosition, _mapZoom);
+      _createMarkerForPosition();
     });
     _showCircularProgressIndicator(false);
   }

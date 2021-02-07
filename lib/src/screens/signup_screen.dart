@@ -119,13 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _showCircularProgressIndicator(true);
     Map<String, dynamic> result = await bloc.register(context);
     _showCircularProgressIndicator(false);
-
-    if (result['status'] != null) {
-      await Future.delayed(Duration(milliseconds: 100));
-      bloc.addError(result['message']);
-    } else {
-      Navigator.pushNamed(context, '/login');
-    }
+    bloc.treatRegisterRestult(result, context);
   }
 
   _showCircularProgressIndicator(bool value) {
