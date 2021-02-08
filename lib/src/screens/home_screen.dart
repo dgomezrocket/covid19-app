@@ -136,7 +136,8 @@ class _HomeState extends State<Home> {
               child: Text('Sí'),
               onPressed: () {
                 AuthService.removeToken();
-                Navigator.popAndPushNamed(context, '/login');
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login', (Route<dynamic> route) => false);
               }),
           FlatButton(
             child: Text('No'),

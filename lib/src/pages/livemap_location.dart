@@ -1,26 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:covid19/src/models/location.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 import 'package:covid19/src/utils/widgets.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
 
 class LiveMap extends StatefulWidget {
+  Location location;
+  LiveMap({this.location});
   @override
   _LiveMapState createState() => _LiveMapState();
 }
 
 class _LiveMapState extends State<LiveMap> {
   Future<Position> _lastKnownPositionFetched;
-  Position position = Position(
+  Position _position = Position(
       latitude: -25.2819, longitude: -57.635); // Asuncion location by default
+  Position _finalResult;
   LatLng _latLngPosition;
+
   double _mapZoom = 15.0;
-  List<LayerOptions> _layers;
+
+  Widget _bodyMap;
 
   LocationPermission _permission;
-  int _amountOfRequestPermission = 3;
+  int _amountOfRequestPermission = 2;
 
   bool _load = false;
   Widget _loadingIndicator;
@@ -29,8 +35,20 @@ class _LiveMapState extends State<LiveMap> {
 
   @override
   void initState() {
-    _lastKnownPositionFetched = _getCurrentLocation(1, true);
+    _lastKnownPositionFetched = _loadDefaultPosition();
+    _bodyMap = _createMap();
     return super.initState();
+  }
+
+  Future<Position> _loadDefaultPosition() async {
+    if (widget.location != null) {
+      _position = Position(
+          latitude: widget.location.latitude,
+          longitude: widget.location.longitude);
+    } else
+      _loadPosition(0, true);
+    _latLngPosition = LatLng(_position.latitude, _position.longitude);
+    return _position;
   }
 
   @override
@@ -44,9 +62,18 @@ class _LiveMapState extends State<LiveMap> {
           return createCircularProgressIndicator();
         else {
           _loadData(snapshot.data);
+
           return Scaffold(
             appBar: AppBar(title: Text("Mi domicilio")),
-            body: _createBody(),
+            body: Stack(
+              children: <Widget>[
+                _bodyMap,
+                Align(
+                  child: _loadingIndicator,
+                  alignment: FractionalOffset.center,
+                ),
+              ],
+            ),
             floatingActionButton: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -79,21 +106,8 @@ class _LiveMapState extends State<LiveMap> {
   }
 
   _loadData(dynamic data) {
-    if (data != null) position = cast<Position>(data);
-    _latLngPosition = LatLng(position.latitude, position.longitude);
-  }
-
-  _createBody() {
-    _createMarkerForPosition();
-    return Stack(
-      children: <Widget>[
-        _createMap(),
-        Align(
-          child: _loadingIndicator,
-          alignment: FractionalOffset.center,
-        ),
-      ],
-    );
+    if (data != null) _position = cast<Position>(data);
+    _latLngPosition = LatLng(_position.latitude, _position.longitude);
   }
 
   _createMap() {
@@ -103,21 +117,21 @@ class _LiveMapState extends State<LiveMap> {
         center: _latLngPosition,
         zoom: _mapZoom,
       ),
-      layers: _layers,
+      layers: _createMarkerForPosition(),
     );
   }
 
-  _createMarkerForPosition() {
-    _layers = [];
+  List<LayerOptions> _createMarkerForPosition() {
+    List<LayerOptions> layers = [];
 
     TileLayerOptions tileLayerOptions = TileLayerOptions(
       urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       subdomains: ['a', 'b', 'c'],
     );
 
-    _layers..add(tileLayerOptions)..add(_createMarker());
+    layers..add(tileLayerOptions)..add(_createMarker());
 
-    return _layers;
+    return layers;
   }
 
   _createMarker() {
@@ -126,7 +140,7 @@ class _LiveMapState extends State<LiveMap> {
         Marker(
           width: 200.0,
           height: 200.0,
-          point: LatLng(position.latitude, position.longitude),
+          point: LatLng(_position.latitude, _position.longitude),
           builder: (ctx) => Container(
             child: Icon(Icons.accessibility),
           ),
@@ -137,30 +151,41 @@ class _LiveMapState extends State<LiveMap> {
 
   _setCurrentPosition() async {
     _showCircularProgressIndicator(true);
-    Position newPosition = await _getCurrentLocation(1, false);
+    await _loadPosition(0, false);
+    _latLngPosition = LatLng(_position.latitude, _position.longitude);
+    _finalResult = _position;
     setState(() {
-      position = newPosition;
-      _latLngPosition = LatLng(position.latitude, position.longitude);
+      _bodyMap = _createMap();
       _mapController.move(_latLngPosition, _mapZoom);
-      _createMarkerForPosition();
     });
     _showCircularProgressIndicator(false);
   }
 
   _returnLocationToProfile() {
-    Navigator.pop(context, position);
+    if (_finalResult == null)
+      Navigator.pop(context, _position);
+    else
+      Navigator.pop(context, _finalResult);
+  }
+
+  Future<dynamic> _loadPosition(int timesRequest, bool lastKnown) async {
+    Position tmp = await _getCurrentLocation(timesRequest, lastKnown);
+    if (tmp != null) {
+      _position = tmp;
+    }
   }
 
   Future<Position> _getCurrentLocation(int timesRequest, bool lastKnown) async {
     _permission = await Geolocator.checkPermission();
-    if (_amountOfRequestPermission > timesRequest) {
+    if (_amountOfRequestPermission >= timesRequest) {
       if (_permission == LocationPermission.whileInUse ||
           _permission == LocationPermission.always) {
         bool isLocationServiceEnabled =
             await Geolocator.isLocationServiceEnabled();
 
         if (!isLocationServiceEnabled) {
-          _launchAlert('Por favor, active su gps para continuar.');
+          await _launchAlert('Por favor, active su gps para continuar.');
+          return _getCurrentLocation(timesRequest + 1, lastKnown);
         }
 
         if (lastKnown)
@@ -169,17 +194,18 @@ class _LiveMapState extends State<LiveMap> {
           return Geolocator.getCurrentPosition(
               desiredAccuracy: LocationAccuracy.high);
       } else {
-        _permission = await Geolocator.requestPermission();
-        _getCurrentLocation(timesRequest + 1, lastKnown);
+        if (_amountOfRequestPermission > timesRequest)
+          _permission = await Geolocator.requestPermission();
+        return _getCurrentLocation(timesRequest + 1, lastKnown);
       }
     } else {
-      _launchAlert('No se puede continuar por falta de permisos.');
+      await _launchAlert('No se puede continuar por falta de permisos.');
       return null;
     }
   }
 
-  void _launchAlert(String message) {
-    showDialog(
+  Future<dynamic> _launchAlert(String message) async {
+    await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
