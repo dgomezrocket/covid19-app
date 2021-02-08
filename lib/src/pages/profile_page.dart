@@ -252,7 +252,9 @@ class _ProfilePageState extends State<ProfilePage> {
     Position positionResult = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LiveMap(),
+          builder: (context) => LiveMap(
+            location: _account.person.location,
+          ),
         ));
     if (positionResult != null) {
       _account.person.location = Location(
