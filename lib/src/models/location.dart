@@ -6,10 +6,13 @@ class Location {
   Location({this.id, this.latitude, this.longitude});
 
   factory Location.fromJson(dynamic json) {
-    return Location(
-        id: json['id'] as int,
-        latitude: json['latitude'] as double,
-        longitude: json['longitude'] as double);
+    if (json != null)
+      return Location(
+          id: json['id'] as int,
+          latitude: json['latitude'] as double,
+          longitude: json['longitude'] as double);
+    else
+      return null;
   }
 
   Map<String, dynamic> toJson() =>

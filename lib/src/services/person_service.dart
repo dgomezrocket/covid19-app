@@ -98,7 +98,7 @@ class PersonService {
     try {
       final String token = await AuthService.getTokenJwt();
       final resp = await http.get(
-        '$baseUrl/hospitals/',
+        '$baseUrl/hospitals/my',
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
       );
 

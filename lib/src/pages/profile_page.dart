@@ -42,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
           location: null,
           status: Status(name: 'HEALTHY'),
           province: Province(name: 'Asunción')),
-      role: Role(id: 0, name: ''));
+      roles: [Role(id: 0, name: '')]);
 
   final dateFormat = DateFormat(dateFormatString);
 
