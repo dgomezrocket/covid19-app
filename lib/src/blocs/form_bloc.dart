@@ -52,7 +52,8 @@ class FormBloc with ValidationMixin {
       await Future.delayed(Duration(milliseconds: 100));
       addError(result['message']);
     } else {
-      Navigator.pushNamed(context, '/login');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
     }
   }
 
@@ -72,7 +73,8 @@ class FormBloc with ValidationMixin {
       addError(result['message']);
     } else {
       AuthService.setToken(result['jwt']);
-      Navigator.pushNamed(context, '/home');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
     }
   }
 

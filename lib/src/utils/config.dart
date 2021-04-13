@@ -1,1 +1,1 @@
-final baseUrl = 'https://saludtotal.pol.una.py';
+final baseUrl = 'https://apisaludtotal.pol.una.py';

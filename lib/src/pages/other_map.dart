@@ -54,10 +54,7 @@ class _OtherMapState extends State<OtherMap> {
               point: LatLng(-25.336135, -57.512170),
               builder: (context) => Container(
                     child: IconButton(
-                        icon: Icon(Icons.accessibility),
-                        onPressed: () {
-                          print('Marker tapped!');
-                        }),
+                        icon: Icon(Icons.accessibility), onPressed: () {}),
                   ))
         ])
       ],
