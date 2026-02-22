@@ -1,1 +1,1 @@
-final baseUrl = 'https://apisaludtotal.pol.una.py';
+final baseUrl = 'https://backend-core-covid19-production.up.railway.app';

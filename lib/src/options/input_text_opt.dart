@@ -6,7 +6,7 @@ class InputOption extends StatefulWidget {
   String value;
   String placeHolder;
 
-  InputOption({this.placeHolder, this.value});
+  InputOption({this.placeHolder = '', this.value = ''});
 
   @override
   _InputOptionState createState() => _InputOptionState();

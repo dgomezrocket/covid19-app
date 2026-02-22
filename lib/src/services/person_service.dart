@@ -12,23 +12,23 @@ import 'package:covid19/src/services/auth_service.dart';
 class PersonService {
   Future<dynamic> getPersonData() async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       final resp = await http.get(
-        '$baseUrl/persons/my',
+        Uri.parse('$baseUrl/persons/my'),
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
       );
 
       return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> putPersonData(Person person) async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       final resp = await http.put(
-        '$baseUrl/persons/',
+        Uri.parse('$baseUrl/persons/'),
         body: jsonEncode(person.toJson()),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -36,17 +36,17 @@ class PersonService {
         },
       );
 
-      return resp?.body;
+      return resp.body;
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> getFormsData() async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       var resp = await http.get(
-        '$baseUrl/forms/my',
+        Uri.parse('$baseUrl/forms/my'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -55,15 +55,15 @@ class PersonService {
 
       return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> getAnswersData() async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       var resp = await http.get(
-        '$baseUrl/answers/',
+        Uri.parse('$baseUrl/answers/'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -72,15 +72,15 @@ class PersonService {
 
       return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> postAnswersData(Answer answer) async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       var resp = await http.post(
-        '$baseUrl/answers/',
+        Uri.parse('$baseUrl/answers/'),
         body: jsonEncode(answer.toJson()),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -88,45 +88,45 @@ class PersonService {
         },
       );
 
-      return resp?.body;
+      return resp.body;
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> getHospitalsData() async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       final resp = await http.get(
-        '$baseUrl/hospitals/my',
+        Uri.parse('$baseUrl/hospitals/my'),
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
       );
 
       return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> getMessagesData() async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       final resp = await http.get(
-        '$baseUrl/messages/',
+        Uri.parse('$baseUrl/messages/'),
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
       );
 
       return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> postMessageData(Message message) async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       var resp = await http.post(
-        '$baseUrl/messages/',
+        Uri.parse('$baseUrl/messages/'),
         body: jsonEncode(message.toJson()),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -134,17 +134,17 @@ class PersonService {
         },
       );
 
-      return resp?.body;
+      return resp.body;
     } finally {
-      // done you can do something here
+      // done
     }
   }
 
   Future<dynamic> getProvinces() async {
     try {
-      final String token = await AuthService.getTokenJwt();
+      final String? token = await AuthService.getTokenJwt();
       var resp = await http.get(
-        '$baseUrl/provinces/',
+        Uri.parse('$baseUrl/provinces/'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -153,7 +153,7 @@ class PersonService {
 
       return json.decode(utf8.decode(resp.bodyBytes));
     } finally {
-      // done you can do something here
+      // done
     }
   }
 }

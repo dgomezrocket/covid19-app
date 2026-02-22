@@ -29,28 +29,28 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
-  Future<Person> _personFetched;
+  Future<Person?>? _personFetched;
   bool _isLogged = false;
 
   @override
   void initState() {
+    super.initState();
     _personFetched = _loadData();
-    return super.initState();
   }
 
-  Future<Person> _loadData() async {
+  Future<Person?> _loadData() async {
     _isLogged = await isLoggedUser();
-    if (_isLogged)
+    if (_isLogged) {
       return profileProvider.getPerson();
-    else
+    } else {
       return null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<Person?>(
       future: _personFetched,
-      initialData: null,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
@@ -63,16 +63,13 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _loadHome(AsyncSnapshot<dynamic> snapshot) {
+  Widget _loadHome(AsyncSnapshot<Person?> snapshot) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Row(children: [
           Text('CroniApp'),
-          Expanded(
-              child: SizedBox(
-            width: 5.0,
-          )),
+          Expanded(child: SizedBox(width: 5.0)),
           GestureDetector(
               child: Text("Salir",
                   style: TextStyle(
@@ -93,7 +90,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _createBottomNavigationBar() {
+  Widget _createBottomNavigationBar() {
     return BottomNavigationBar(
       onTap: onTabTapped,
       currentIndex: _currentIndex,
@@ -103,43 +100,43 @@ class _HomeState extends State<Home> {
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
-          title: Text('Datos'),
+          label: 'Datos',
         ),
         BottomNavigationBarItem(
-          icon: new Icon(Icons.assessment),
-          title: Text('Formularios'),
+          icon: Icon(Icons.assessment),
+          label: 'Formularios',
         ),
         BottomNavigationBarItem(
-          icon: new Icon(Icons.assessment),
-          title: Text('Respuestas'),
+          icon: Icon(Icons.assessment),
+          label: 'Respuestas',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_location),
-          title: Text('Hospitales'),
+          label: 'Hospitales',
         ),
         BottomNavigationBarItem(
-          icon: new Icon(Icons.mail),
-          title: Text('Mensajes'),
+          icon: Icon(Icons.mail),
+          label: 'Mensajes',
         ),
       ],
     );
   }
 
-  _logout(BuildContext context) async {
+  Future<bool?> _logout(BuildContext context) async {
     return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Salir'),
         content: Text('¿Está seguro que desea salir?'),
         actions: [
-          FlatButton(
+          TextButton(
               child: Text('Sí'),
               onPressed: () {
                 AuthService.removeToken();
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     '/login', (Route<dynamic> route) => false);
               }),
-          FlatButton(
+          TextButton(
             child: Text('No'),
             onPressed: () => Navigator.pop(context, false),
           ),

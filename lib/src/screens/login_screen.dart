@@ -9,17 +9,13 @@ import 'package:covid19/src/utils/widgets.dart';
 import 'package:covid19/src/utils/functions_utils.dart';
 
 class LoginScreen extends StatefulWidget {
-  // single approch way
-  // final bloc = new FormBloc();
-
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _load = false;
-
-  Widget loadingIndicator;
+  Widget? loadingIndicator;
 
   Future<bool> _loadData() async {
     return await isLoggedUser();
@@ -28,15 +24,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final FormBloc formBloc = Provider.of(context);
-    loadingIndicator = !_load ? new Container() : createLoader();
+    loadingIndicator = !_load ? Container() : createLoader();
 
-    return FutureBuilder(
+    return FutureBuilder<bool>(
       future: _loadData(),
-      initialData: null,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
-        } else if (snapshot.data) {
+        } else if (snapshot.data == true) {
           return Home();
         } else {
           return Scaffold(
@@ -47,8 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: SingleChildScrollView(
                   child: Center(
                     child: Container(
-                      margin:
-                          EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
+                      margin: EdgeInsets.only(top: 100.0, left: 50.0, right: 50.0),
                       height: 550.0,
                       child: Form(
                         child: Column(
@@ -60,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 35,
                               child: Helper().errorMessage(formBloc),
                             ),
-                            //_checkBox(),
                             _buttonField(formBloc),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,16 +62,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onTap: () => Navigator.pushNamed(
                                       context, '/forgot_password'),
                                   child: Container(
-                                    child: Text('Olvidaste la contraseña?'),
                                     alignment: Alignment.bottomLeft,
+                                    child: Text('Olvidaste la contraseña?'),
                                   ),
                                 ),
                                 GestureDetector(
                                   onTap: () =>
                                       Navigator.pushNamed(context, '/signup'),
                                   child: Container(
-                                    child: Text('Registrarse'),
                                     alignment: Alignment.bottomLeft,
+                                    child: Text('Registrarse'),
                                   ),
                                 ),
                               ],
@@ -91,8 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Align(
-                child: loadingIndicator,
                 alignment: FractionalOffset.center,
+                child: loadingIndicator,
               ),
             ],
           ));
@@ -110,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
             decoration: InputDecoration(
               hintText: 'correo@ejemplo.com',
               labelText: 'Correo',
-              errorText: snapshot.error,
+              errorText: snapshot.error?.toString(),
             ),
             onChanged: bloc.changeEmail,
           );
@@ -128,22 +121,10 @@ class _LoginScreenState extends State<LoginScreen> {
             decoration: InputDecoration(
               hintText: '',
               labelText: 'Contraseña',
-              errorText: snapshot.error,
+              errorText: snapshot.error?.toString(),
             ),
           );
         });
-  }
-
-  Widget _checkBox() {
-    return Row(
-      children: <Widget>[
-        Checkbox(
-          onChanged: (checked) => {},
-          value: true,
-        ),
-        Text('Mantenerme conectado'),
-      ],
-    );
   }
 
   Widget _buttonField(FormBloc bloc) {
@@ -152,33 +133,31 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, snapshot) {
           return Padding(
             padding: const EdgeInsets.all(20.0),
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () {
                 if (snapshot.hasError) {
-                  return null;
+                  return;
                 }
                 _login(bloc, context);
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                elevation: 10,
+              ),
               child: const Icon(Icons.arrow_forward),
-              color: Colors.amber,
-              clipBehavior: Clip.hardEdge,
-              elevation: 10,
-              disabledColor: Colors.blueGrey,
-              disabledElevation: 10,
-              disabledTextColor: Colors.white,
             ),
           );
         });
   }
 
-  _login(FormBloc bloc, BuildContext context) async {
+  Future<void> _login(FormBloc bloc, BuildContext context) async {
     _showCircularProgressIndicator(true);
     Map<String, dynamic> result = await bloc.login(context);
     _showCircularProgressIndicator(false);
     bloc.treatLoginResult(result, context);
   }
 
-  _showCircularProgressIndicator(bool value) {
+  void _showCircularProgressIndicator(bool value) {
     setState(() {
       _load = value;
     });

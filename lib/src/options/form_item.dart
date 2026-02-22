@@ -7,7 +7,7 @@ import 'package:covid19/src/utils/styles_options.dart';
 class FormItem extends StatefulWidget {
   final FormPerson form;
 
-  const FormItem({this.form});
+  const FormItem({required this.form});
 
   @override
   _FormItemState createState() => _FormItemState();

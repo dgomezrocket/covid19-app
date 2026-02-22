@@ -4,55 +4,40 @@ import 'package:covid19/src/models/form.dart';
 import 'package:covid19/src/models/items_answer.dart';
 
 class Answer {
-  int id;
+  int? id;
   FormPerson form;
-  DateTime answerDate;
+  DateTime? answerDate;
   List<ItemsAnswer> answers;
 
-  Answer({this.id, this.form, this.answerDate, this.answers});
+  Answer({this.id, required this.form, this.answerDate, required this.answers});
 
   factory Answer.fromJson(dynamic json) {
+    List<ItemsAnswer> answers = [];
     if (json['answers'] != null) {
       var answersObjsJson = json['answers'] as List;
-
-      List<ItemsAnswer> _answers = answersObjsJson
+      answers = answersObjsJson
           .map((answer) => ItemsAnswer.fromJson(answer))
           .toList();
+    }
 
-      return Answer(
-          id: json['id'] as int,
-          form: FormPerson.fromJson(json['form']),
-          answerDate: json['answerDate'] == null
-              ? null
-              : DateTime.parse(json['answerDate'].toString()),
-          answers: _answers);
-    } else
-      return Answer(
-          id: json['id'] as int,
-          form: FormPerson.fromJson(json['form']),
-          answerDate: json['answerDate'] == null
-              ? null
-              : DateTime.parse(json['answerDate'].toString()));
+    return Answer(
+        id: json['id'] as int?,
+        form: FormPerson.fromJson(json['form']),
+        answerDate: json['answerDate'] == null
+            ? null
+            : DateTime.parse(json['answerDate'].toString()),
+        answers: answers);
   }
 
-  Map<String, dynamic> toJson() {
-    if (this.answers != null)
-      return {
+  Map<String, dynamic> toJson() => {
         'id': id,
         'form': form.toJson(),
-        'answerDate': answerDate == null ? null : answerDate.toIso8601String(),
+        'answerDate': answerDate?.toIso8601String(),
         'answers': answers.map((answer) => answer.toJson()).toList()
       };
-    else
-      return {
-        'id': id,
-        'form': form.toJson(),
-        'answerDate': answerDate == null ? null : answerDate.toIso8601String()
-      };
-  }
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.form}, ${this.answerDate}, ${this.answers} }';
+    return '{ $id, $form, $answerDate, $answers }';
   }
 }

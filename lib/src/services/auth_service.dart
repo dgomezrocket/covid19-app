@@ -3,22 +3,26 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import 'package:flutter_session/flutter_session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:covid19/src/utils/config.dart';
 
 class AuthService {
-  static final SESSION = FlutterSession();
+  static SharedPreferences? _prefs;
+
+  static Future<void> _initPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+  }
 
   Future<dynamic> register(String email, String password) async {
     try {
       var res = await http.post(
-        '$baseUrl/accounts/signup',
+        Uri.parse('$baseUrl/accounts/signup'),
         body: jsonEncode({'email': email, 'password': password}),
         headers: {HttpHeaders.contentTypeHeader: 'application/json'},
       );
 
-      return res?.body;
+      return res.body;
     } finally {
       // done you can do something here
     }
@@ -27,49 +31,37 @@ class AuthService {
   Future<dynamic> login(String email, String password) async {
     try {
       var res = await http.post(
-        '$baseUrl/authentication/authenticate',
+        Uri.parse('$baseUrl/authentication/authenticate'),
         body: jsonEncode({'email': email, 'password': password}),
         headers: {HttpHeaders.contentTypeHeader: 'application/json'},
       );
 
-      return res?.body;
+      return res.body;
     } finally {
-      // you can do somethig here
+      // you can do something here
     }
   }
 
-  static setToken(String token) async {
-    _AuthData data = _AuthData(token);
-    await SESSION.set('token', data);
+  static Future<void> setToken(String token) async {
+    await _initPrefs();
+    await _prefs!.setString('token', token);
   }
 
-  static Future<Map<String, dynamic>> getToken() async {
-    return await SESSION.get('token');
+  static Future<String?> getToken() async {
+    await _initPrefs();
+    return _prefs!.getString('token');
   }
 
-  static removeToken() async {
-    await SESSION.prefs.clear();
+  static Future<void> removeToken() async {
+    await _initPrefs();
+    await _prefs!.clear();
   }
 
-  static getTokenJwt() async {
-    if (SESSION.prefs.containsKey('token')) {
-      return (await SESSION.get('token'))['jwt'];
-    } else
-      return null;
-  }
-}
-
-class _AuthData {
-  String token;
-  _AuthData(this.token);
-
-  // toJson
-  // required by Session lib
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-
-    data['jwt'] = token;
-
-    return data;
+  static Future<String?> getTokenJwt() async {
+    await _initPrefs();
+    if (_prefs!.containsKey('token')) {
+      return _prefs!.getString('token');
+    }
+    return null;
   }
 }

@@ -16,9 +16,9 @@ import 'package:covid19/src/utils/widgets.dart';
 
 class FormPage extends StatefulWidget {
   final FormPerson form;
-  List<Widget> items;
+  List<Widget>? items;
 
-  FormPage({this.form});
+  FormPage({required this.form});
 
   @override
   _FormPageState createState() => _FormPageState();
@@ -26,17 +26,17 @@ class FormPage extends StatefulWidget {
 
 class _FormPageState extends State<FormPage> {
   bool _load = false;
-  Widget loadingIndicator;
+  Widget? loadingIndicator;
 
   @override
   void initState() {
+    super.initState();
     widget.items = widget.form.itemsForm.map(_createFormList).toList();
-    return super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    loadingIndicator = !_load ? new Container() : createLoader();
+    loadingIndicator = !_load ? Container() : createLoader();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.form.title),
@@ -44,11 +44,11 @@ class _FormPageState extends State<FormPage> {
       body: Stack(
         children: [
           ListView(
-            children: widget.items,
+            children: widget.items ?? [],
           ),
           Align(
-            child: loadingIndicator,
             alignment: FractionalOffset.center,
+            child: loadingIndicator,
           ),
         ],
       ),
@@ -79,11 +79,11 @@ class _FormPageState extends State<FormPage> {
     }
   }
 
-  _createSaveButton(BuildContext context) {
+  Widget _createSaveButton(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        FlatButton(
+        TextButton(
           child: Text('Guardar'),
           onPressed: () {
             _showConfirmation(context);
@@ -120,14 +120,14 @@ class _FormPageState extends State<FormPage> {
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text('Guardar'),
                 onPressed: () {
                   Navigator.pop(context);
                   _saveAnswer(context);
                 },
               ),
-              FlatButton(
+              TextButton(
                 child: Text('Cancelar'),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -136,41 +136,40 @@ class _FormPageState extends State<FormPage> {
         });
   }
 
-  _saveAnswer(BuildContext context) async {
+  Future<void> _saveAnswer(BuildContext context) async {
     _showCircularProgressIndicator(true);
     bool result = await _getAnswer();
     _showCircularProgressIndicator(false);
-    if (result)
+    if (result) {
       _launchAlert('Se guardaron exitosamente los datos.');
-    else
+    } else {
       _launchAlert('Ocurrió un error al guardar los datos.');
+    }
   }
 
   Future<bool> _getAnswer() async {
     Answer answer = Answer(
       form: widget.form,
       answerDate: DateTime.now(),
-      answers: new List<ItemsAnswer>(),
+      answers: <ItemsAnswer>[],
     );
-    widget.items.forEach((item) {
-      if (cast<CheckOption>(item) != null) {
-        CheckOption checkOption = cast<CheckOption>(item);
-        if (checkOption.value)
-          answer.answers.add(ItemsAnswer(item: checkOption.item));
-      } else if (cast<ItemInputExpansible>(item) != null) {
-        ItemInputExpansible itemInputExpansible =
-            cast<ItemInputExpansible>(item);
-        if (itemInputExpansible.check)
-          answer.answers.add(ItemsAnswer(
-              answerText: itemInputExpansible.value,
-              item: itemInputExpansible.item));
+    widget.items?.forEach((item) {
+      CheckOption? checkOption = cast<CheckOption>(item);
+      ItemInputExpansible? itemInputExpansible = cast<ItemInputExpansible>(item);
+      
+      if (checkOption != null && checkOption.value) {
+        answer.answers.add(ItemsAnswer(item: checkOption.item));
+      } else if (itemInputExpansible != null && itemInputExpansible.check) {
+        answer.answers.add(ItemsAnswer(
+            answerText: itemInputExpansible.value,
+            item: itemInputExpansible.item));
       }
     });
 
     return await profileProvider.postAnswer(answer);
   }
 
-  _launchAlert(String result) {
+  void _launchAlert(String result) {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -188,7 +187,7 @@ class _FormPageState extends State<FormPage> {
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
@@ -200,7 +199,7 @@ class _FormPageState extends State<FormPage> {
         });
   }
 
-  _showCircularProgressIndicator(bool value) {
+  void _showCircularProgressIndicator(bool value) {
     setState(() {
       _load = value;
     });

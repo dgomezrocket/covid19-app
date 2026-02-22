@@ -18,15 +18,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
-  ProfilePage({Key key}) : super(key: key);
+  ProfilePage({Key? key}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Future<Person> _personFetched;
-  List<Province> _provinces;
+  Future<Person?>? _personFetched;
+  List<Province> _provinces = [];
   Account _account = Account(
       id: 0,
       email: '',
@@ -41,7 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
           address: '',
           location: null,
           status: Status(name: 'HEALTHY'),
-          province: Province(name: 'Asunción')),
+          province: Province(code: '', name: 'Asunción', capital: '')),
       roles: [Role(id: 0, name: '')]);
 
   final dateFormat = DateFormat(dateFormatString);
@@ -51,18 +51,18 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> _sexs = ['MASCULINO', 'FEMENINO'];
 
   bool _load = false;
-  Widget loadingIndicator;
+  Widget? loadingIndicator;
 
-  // controllers for form text controllers
-  CustomEditingController _documentController = new CustomEditingController();
-  CustomEditingController _nameController = new CustomEditingController();
-  CustomEditingController _lastnameController = new CustomEditingController();
-  CustomEditingController _birthDateController = new CustomEditingController();
-  CustomEditingController _phoneController = new CustomEditingController();
-  CustomEditingController _addressController = new CustomEditingController();
+  CustomEditingController _documentController = CustomEditingController();
+  CustomEditingController _nameController = CustomEditingController();
+  CustomEditingController _lastnameController = CustomEditingController();
+  CustomEditingController _birthDateController = CustomEditingController();
+  CustomEditingController _phoneController = CustomEditingController();
+  CustomEditingController _addressController = CustomEditingController();
 
   @override
   void initState() {
+    super.initState();
     _personFetched = _loadAsynchronousData();
     _documentController.text = '';
     _nameController.text = '';
@@ -70,21 +70,19 @@ class _ProfilePageState extends State<ProfilePage> {
     _birthDateController.text = '';
     _phoneController.text = '';
     _addressController.text = '';
-    return super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    loadingIndicator = !_load ? new Container() : createLoader();
+    loadingIndicator = !_load ? Container() : createLoader();
     return Container(
       child: _loadProfile(context),
     );
   }
 
-  _loadProfile(BuildContext context) {
-    return FutureBuilder(
+  Widget _loadProfile(BuildContext context) {
+    return FutureBuilder<Person?>(
       future: _personFetched,
-      initialData: null,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
@@ -96,14 +94,13 @@ class _ProfilePageState extends State<ProfilePage> {
               Form(
                 key: _formKey,
                 child: ListView(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                   children: _createElements(),
                 ),
               ),
               Align(
-                child: loadingIndicator,
                 alignment: FractionalOffset.center,
+                child: loadingIndicator,
               ),
             ],
           );
@@ -112,26 +109,26 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  _loadPersonData(dynamic data) {
+  void _loadPersonData(Person? data) {
     if (data != null) {
-      _account.person = cast<Person>(data);
-      if (_account.person.province == null) {
-        _account.person.province = _provinces[0];
+      _account = Account(email: _account.email, person: data);
+      if (_account.person?.province == null && _provinces.isNotEmpty) {
+        _account.person?.province = _provinces[0];
       }
-      _documentController.text = _account.person.document;
-      _nameController.text = _account.person.name;
-      _lastnameController.text = _account.person.lastname;
-      _birthDateController.text = _account.person.birthDate == null
+      _documentController.text = _account.person?.document ?? '';
+      _nameController.text = _account.person?.name ?? '';
+      _lastnameController.text = _account.person?.lastname ?? '';
+      _birthDateController.text = _account.person?.birthDate == null
           ? ''
-          : dateFormat.format(DateTime.now());
-      _phoneController.text = _account.person.phone;
-      _addressController.text = _account.person.address;
-    } else {
-      _account.person.province = _provinces[0];
+          : dateFormat.format(_account.person!.birthDate!);
+      _phoneController.text = _account.person?.phone ?? '';
+      _addressController.text = _account.person?.address ?? '';
+    } else if (_provinces.isNotEmpty) {
+      _account.person?.province = _provinces[0];
     }
   }
 
-  Future<Person> _loadAsynchronousData() async {
+  Future<Person?> _loadAsynchronousData() async {
     _provinces = await profileProvider.getProvices();
     return profileProvider.getPerson();
   }
@@ -168,9 +165,6 @@ class _ProfilePageState extends State<ProfilePage> {
           Icons.accessibility,
           Icons.account_circle),
       Divider(),
-      // _createInput(
-      //     'Email', 'Email', setEmail, Icons.alternate_email, Icons.email),
-      // Divider(),
       _createInput(
           'Teléfono',
           'Teléfono',
@@ -199,15 +193,13 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       Divider(),
-      _createDropdown(_account.person.province.name, _provinces, _setProvince),
+      _createDropdown(_account.person?.province?.name ?? 'Asunción', _provinces, _setProvince),
       Divider(),
       _createInputDate(context),
       Divider(),
-      _createDropdown(_account.person.sex, _sexs, _setSex),
+      _createDropdown(_account.person?.sex ?? 'MASCULINO', _sexs, _setSex),
       Divider(),
-      SizedBox(
-        height: 20.0,
-      ),
+      SizedBox(height: 20.0),
       _createSaveButton(context),
     ];
   }
@@ -217,9 +209,9 @@ class _ProfilePageState extends State<ProfilePage> {
       String labelText,
       String errorMessage,
       TextEditingController controller,
-      Function onChangeFunction,
-      Function condition,
-      IconData suffixIcon,
+      Function(String) onChangeFunction,
+      bool Function(String) condition,
+      IconData? suffixIcon,
       IconData iconData) {
     return TextFormField(
       controller: controller,
@@ -227,11 +219,11 @@ class _ProfilePageState extends State<ProfilePage> {
           counter: Text('${controller.text.length}'),
           hintText: hintText,
           labelText: labelText,
-          suffixIcon: Icon(suffixIcon),
+          suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
           icon: Icon(iconData)),
       onChanged: onChangeFunction,
       validator: (value) {
-        if (condition(value)) {
+        if (condition(value ?? '')) {
           return errorMessage;
         }
         return null;
@@ -248,30 +240,29 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  _getLocationFromLiveMapPage() async {
-    Position positionResult = await Navigator.push(
+  Future<void> _getLocationFromLiveMapPage() async {
+    Position? positionResult = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => LiveMap(
-            location: _account.person.location,
+            location: _account.person?.location,
           ),
         ));
     if (positionResult != null) {
-      _account.person.location = Location(
+      _account.person?.location = Location(
           latitude: positionResult.latitude,
           longitude: positionResult.longitude);
     }
   }
 
   List<DropdownMenuItem<String>> _getOptionsDropdown(List<dynamic> options) {
-    List<DropdownMenuItem<String>> list = new List();
-    options.forEach((option) {
+    List<DropdownMenuItem<String>> list = [];
+    for (var option in options) {
       list.add(DropdownMenuItem(
         child: Text((option is String) ? option : option.name),
         value: (option is String) ? option : option.name,
       ));
-    });
-
+    }
     return list;
   }
 
@@ -285,37 +276,37 @@ class _ProfilePageState extends State<ProfilePage> {
           suffixIcon: Icon(Icons.perm_contact_calendar),
           icon: Icon(Icons.calendar_today)),
       onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
+        FocusScope.of(context).requestFocus(FocusNode());
         _selectDate(context);
       },
     );
   }
 
-  _selectDate(BuildContext context) async {
-    DateTime picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime(DateTime.now().year - adultAge),
       firstDate: DateTime(1800),
-      lastDate: DateTime.now(), //DateTime(DateTime.now().year - adultAge),
+      lastDate: DateTime.now(),
       locale: Locale('es', 'ES'),
     );
 
     if (picked != null) {
       setState(() {
-        _account.person.birthDate = picked;
+        _account.person?.birthDate = picked;
         _birthDateController.text = dateFormat.format(picked);
       });
     }
   }
 
   Widget _createDropdown(
-      String value, List<dynamic> options, Function onChangeFunction) {
+      String value, List<dynamic> options, Function(String?) onChangeFunction) {
     return Row(
       children: <Widget>[
         Icon(Icons.select_all),
         SizedBox(width: 30.0),
         Expanded(
-          child: DropdownButton(
+          child: DropdownButton<String>(
             value: value,
             items: _getOptionsDropdown(options),
             onChanged: onChangeFunction,
@@ -336,9 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.save_alt),
-            SizedBox(
-              width: 5.0,
-            ),
+            SizedBox(width: 5.0),
             Text('Guardar'),
           ],
         ),
@@ -356,33 +345,27 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(10.0)),
             title: Row(
               children: [
-                Icon(
-                  Icons.save,
-                  size: 30.0,
-                ),
+                Icon(Icons.save, size: 30.0),
                 Text('Confirmar'),
               ],
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  '¿Está seguro de que desea guardar?',
-                  locale: localES,
-                ),
+                Text('¿Está seguro de que desea guardar?', locale: localES),
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text('Guardar'),
                 onPressed: () {
                   Navigator.pop(context);
-                  if (_formKey.currentState.validate()) {
+                  if (_formKey.currentState?.validate() ?? false) {
                     _saveProfile(context);
                   }
                 },
               ),
-              FlatButton(
+              TextButton(
                 child: Text('Cancelar'),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -391,21 +374,25 @@ class _ProfilePageState extends State<ProfilePage> {
         });
   }
 
-  _saveProfile(BuildContext context) async {
+  Future<void> _saveProfile(BuildContext context) async {
     _showCircularProgressIndicator(true);
     bool result = await _getPerson();
     _showCircularProgressIndicator(false);
-    if (result)
+    if (result) {
       _launchAlert('Se guardaron exitosamente los datos.');
-    else
+    } else {
       _launchAlert('Ocurrió un error al guardar los datos.');
+    }
   }
 
   Future<bool> _getPerson() async {
-    return await profileProvider.putPerson(_account.person);
+    if (_account.person != null) {
+      return await profileProvider.putPerson(_account.person!);
+    }
+    return false;
   }
 
-  _launchAlert(String result) {
+  void _launchAlert(String result) {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -416,14 +403,11 @@ class _ProfilePageState extends State<ProfilePage> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  result,
-                  locale: localES,
-                ),
+                Text(result, locale: localES),
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
@@ -435,59 +419,49 @@ class _ProfilePageState extends State<ProfilePage> {
         });
   }
 
-  _setDocument(document) {
-    setState(() => _account.person.document = document);
+  void _setDocument(String document) {
+    setState(() => _account.person?.document = document);
   }
 
-  _setName(name) {
-    setState(() => _account.person.name = name);
+  void _setName(String name) {
+    setState(() => _account.person?.name = name);
   }
 
-  _setLastname(lastname) {
-    setState(() => _account.person.lastname = lastname);
+  void _setLastname(String lastname) {
+    setState(() => _account.person?.lastname = lastname);
   }
 
-  _setEmail(email) {
-    setState(() => _account.email = email);
+  void _setAddress(String address) {
+    setState(() => _account.person?.address = address);
   }
 
-  _setAddress(address) {
-    setState(() => _account.person.address = address);
+  void _setphone(String phone) {
+    setState(() => _account.person?.phone = phone);
   }
 
-  _setphone(phone) {
-    setState(() => _account.person.phone = phone);
+  void _setSex(String? sex) {
+    setState(() => _account.person?.sex = sex ?? 'MASCULINO');
   }
 
-  _setSex(sex) {
-    setState(() => _account.person.sex = sex);
-  }
-
-  _setProvince(String province) {
-    setState(() => _account.person.province = (_provinces == null)
-        ? Province(name: 'Asunción')
+  void _setProvince(String? province) {
+    setState(() => _account.person?.province = (_provinces.isEmpty)
+        ? Province(code: '', name: 'Asunción', capital: '')
         : _provinces
             .where((provinceItem) => provinceItem.name == province)
             .toList()[0]);
   }
 
-  _showCircularProgressIndicator(bool value) {
+  void _showCircularProgressIndicator(bool value) {
     setState(() {
       _load = value;
     });
   }
 
-  _nonEmptyValidation(String value) {
-    if (value.isNotEmpty)
-      return false;
-    else
-      return true;
+  bool _nonEmptyValidation(String value) {
+    return value.isEmpty;
   }
 
-  _nonEmptyAddress(String value) {
-    if (value.isNotEmpty && _account.person.location != null) {
-      return false;
-    } else
-      return true;
+  bool _nonEmptyAddress(String value) {
+    return value.isEmpty || _account.person?.location == null;
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/models/answer.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
 import 'package:covid19/src/options/answer_expansible.dart';
-import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/widgets.dart';
 
 class AnswersPage extends StatefulWidget {
@@ -12,14 +11,13 @@ class AnswersPage extends StatefulWidget {
 }
 
 class _AnswersPageState extends State<AnswersPage> {
-  Future<List<Answer>> _answersFetched;
-
-  List<Answer> _answers = List();
+  Future<List<Answer>>? _answersFetched;
+  List<Answer> _answers = [];
 
   @override
   void initState() {
+    super.initState();
     _answersFetched = profileProvider.getAnswers();
-    return super.initState();
   }
 
   @override
@@ -29,24 +27,19 @@ class _AnswersPageState extends State<AnswersPage> {
     );
   }
 
-  _createAnswerList() {
-    return FutureBuilder(
+  Widget _createAnswerList() {
+    return FutureBuilder<List<Answer>>(
       future: _answersFetched,
-      initialData: null,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
         } else if (snapshot.hasData) {
-          _loadData(snapshot.data);
-
+          _answers = snapshot.data ?? [];
           return AnswerExpansible(answers: _answers);
-        } else
+        } else {
           return Container();
+        }
       },
     );
-  }
-
-  _loadData(dynamic data) {
-    if (data != null) _answers = cast<List<Answer>>(data);
   }
 }

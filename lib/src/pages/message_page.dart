@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:covid19/src/providers/profile_provider.dart';
 import 'package:covid19/src/models/message_response.dart';
 import 'package:covid19/src/models/message.dart';
+import 'package:covid19/src/models/message_item.dart';
 import 'package:covid19/src/options/message_option.dart';
-import 'package:covid19/src/utils/functions_utils.dart';
 import 'package:covid19/src/utils/widgets.dart';
 
 class MessagePage extends StatefulWidget {
@@ -13,34 +13,33 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
-  Future<MessageResponse> _messagesFetched;
-  MessageResponse _messageResponse;
+  Future<MessageResponse?>? _messagesFetched;
+  MessageResponse? _messageResponse;
 
   String _messageWrote = '';
-  MessageBox _messageBox;
+  MessageBox? _messageBox;
 
   bool _load = false;
-  Widget loadingIndicator;
+  Widget? loadingIndicator;
 
   TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
+    super.initState();
     _messagesFetched = _buildMessagePage();
-    return super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    loadingIndicator = !_load ? new Container() : createLoader();
-    return FutureBuilder(
+    loadingIndicator = !_load ? Container() : createLoader();
+    return FutureBuilder<MessageResponse?>(
       future: _messagesFetched,
-      initialData: null,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
         } else if (snapshot.hasData) {
-          _loadData(snapshot.data);
+          _messageResponse = snapshot.data;
 
           return GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
@@ -49,37 +48,36 @@ class _MessagePageState extends State<MessagePage> {
                 Column(
                   children: [
                     Expanded(
-                      child: _messageBox,
+                      child: _messageBox ?? Container(),
                     ),
                     _buildMessageComposer(context),
                   ],
                 ),
                 Align(
-                  child: loadingIndicator,
                   alignment: FractionalOffset.center,
+                  child: loadingIndicator,
                 ),
               ],
             ),
           );
-        } else
+        } else {
           return Container();
+        }
       },
     );
   }
 
-  _loadData(dynamic data) {
-    if (data != null) _messageResponse = cast<MessageResponse>(data);
-  }
-
-  Future<MessageResponse> _buildMessagePage() async {
+  Future<MessageResponse?> _buildMessagePage() async {
     _messageResponse = await profileProvider.getMessages();
-    _messageBox = MessageBox(
-      messages: _messageResponse.messages,
-    );
+    if (_messageResponse != null) {
+      _messageBox = MessageBox(
+        messages: _messageResponse!.messages,
+      );
+    }
     return _messageResponse;
   }
 
-  _buildMessageComposer(BuildContext context) {
+  Widget _buildMessageComposer(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       height: 70.0,
@@ -90,7 +88,7 @@ class _MessagePageState extends State<MessagePage> {
             icon: Icon(Icons.read_more),
             iconSize: 25.0,
             color: Theme.of(context).primaryColor,
-            //onPressed: () {},
+            onPressed: () {},
           ),
           Expanded(
             child: TextField(
@@ -112,22 +110,20 @@ class _MessagePageState extends State<MessagePage> {
             icon: Icon(Icons.send),
             iconSize: 25.0,
             color: Theme.of(context).primaryColor,
-            onPressed: (_messageWrote.isEmpty)
-                ? null
-                : _saveMessage, //guardar mensaje en back
+            onPressed: (_messageWrote.isEmpty) ? null : _saveMessage,
           ),
         ],
       ),
     );
   }
 
-  _saveMessage() async {
+  Future<void> _saveMessage() async {
     _showCircularProgressIndicator(true);
     int receiverId = _getSenderId();
     Message messageToSend = Message(
       messageText: _messageWrote,
       personReceivedId: receiverId,
-      personSenderId: _messageResponse.myData.id,
+      personSenderId: _messageResponse?.myData.id ?? 0,
       sendDate: DateTime.now(),
     );
     await profileProvider.postMessage(messageToSend);
@@ -139,22 +135,24 @@ class _MessagePageState extends State<MessagePage> {
     _showCircularProgressIndicator(false);
   }
 
-  _showCircularProgressIndicator(bool value) {
+  void _showCircularProgressIndicator(bool value) {
     setState(() {
       _load = value;
     });
   }
 
-  _getSenderId() {
+  int _getSenderId() {
     int idSender = 0;
-    DateTime date = null;
-    _messageResponse.messages.forEach((messageItem) {
-      if (_messageResponse.myData.id != messageItem.person.id &&
-          (date == null || date.isBefore(messageItem.messageDate))) {
-        idSender = messageItem.id;
-        date = messageItem.messageDate;
+    DateTime? date;
+    if (_messageResponse?.messages != null) {
+      for (MessageItem messageItem in _messageResponse!.messages) {
+        if (_messageResponse?.myData.id != messageItem.person.id &&
+            (date == null || (messageItem.messageDate != null && date.isBefore(messageItem.messageDate!)))) {
+          idSender = messageItem.id ?? 0;
+          date = messageItem.messageDate;
+        }
       }
-    });
+    }
     return idSender;
   }
 }

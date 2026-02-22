@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 import 'package:covid19/src/providers/profile_provider.dart';
 import 'package:covid19/src/models/hospital_response.dart';
@@ -14,75 +14,75 @@ class OSMMap extends StatefulWidget {
 }
 
 class _OSMMapState extends State<OSMMap> {
-  Future<HospitalResponse> _hospitalsFetched;
+  Future<HospitalResponse>? _hospitalsFetched;
+  
   @override
   void initState() {
+    super.initState();
     _hospitalsFetched = profileProvider.getHospitals();
-    return super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<HospitalResponse>(
       future: _hospitalsFetched,
-      initialData: null,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
-        else if (snapshot.hasData)
-          return _createMap(snapshot.data);
-        else
+        } else if (snapshot.hasData) {
+          return _createMap(snapshot.data!);
+        } else {
           return Container();
+        }
       },
     );
   }
 
-  _createMap(HospitalResponse hospitalResponse) {
+  Widget _createMap(HospitalResponse hospitalResponse) {
     return Stack(
       children: <Widget>[
         FlutterMap(
           options: MapOptions(
-            center: LatLng(hospitalResponse.person.location.latitude,
-                hospitalResponse.person.location.longitude),
-            zoom: 15.0,
+            initialCenter: LatLng(
+                hospitalResponse.person.location?.latitude ?? -25.2819,
+                hospitalResponse.person.location?.longitude ?? -57.635),
+            initialZoom: 15.0,
           ),
-          layers: _createMarkertsIncludeLocation(hospitalResponse),
+          children: _createMarkersIncludeLocation(hospitalResponse),
         ),
       ],
     );
   }
 
-  _createMarkertsIncludeLocation(HospitalResponse hospitalResponse) {
-    final List<LayerOptions> layers = [];
+  List<Widget> _createMarkersIncludeLocation(HospitalResponse hospitalResponse) {
+    final List<Widget> layers = [];
 
-    TileLayerOptions tileLayerOptions = TileLayerOptions(
+    layers.add(TileLayer(
       urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      subdomains: ['a', 'b', 'c'],
-    );
+      subdomains: const ['a', 'b', 'c'],
+    ));
 
-    layers
-      ..add(tileLayerOptions)
-      ..add(_createMarker(hospitalResponse.person.location, true));
+    if (hospitalResponse.person.location != null) {
+      layers.add(_createMarker(hospitalResponse.person.location!, true));
+    }
 
-    hospitalResponse.hospitals.forEach((hospital) {
+    for (var hospital in hospitalResponse.hospitals) {
       layers.add(_createMarker(hospital.location, false));
-    });
+    }
 
     return layers;
   }
 
-  _createMarker(Location location, bool person) {
-    IconData icon = (person) ? Icons.accessibility : Icons.local_hospital;
+  Widget _createMarker(Location location, bool person) {
+    IconData icon = person ? Icons.accessibility : Icons.local_hospital;
 
-    return MarkerLayerOptions(
+    return MarkerLayer(
       markers: [
         Marker(
           width: 200.0,
           height: 200.0,
           point: LatLng(location.latitude, location.longitude),
-          builder: (ctx) => Container(
-            child: Icon(icon),
-          ),
+          child: Icon(icon),
         ),
       ],
     );

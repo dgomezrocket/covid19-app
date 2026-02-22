@@ -1,19 +1,19 @@
 class Option {
-  int id;
+  int? id;
   String title;
   String subtitle;
   String type;
   int orderLevel;
 
-  Option({this.id, this.title, this.subtitle, this.type, this.orderLevel});
+  Option({this.id, required this.title, required this.subtitle, required this.type, required this.orderLevel});
 
   factory Option.fromJson(dynamic json) {
     return Option(
-        id: json['id'] as int,
-        title: json['title'] as String,
-        subtitle: json['subtitle'] as String,
-        type: json['type'] as String,
-        orderLevel: json['orderLevel'] as int);
+        id: json['id'] as int?,
+        title: json['title'] as String? ?? '',
+        subtitle: json['subtitle'] as String? ?? '',
+        type: json['type'] as String? ?? '',
+        orderLevel: json['orderLevel'] as int? ?? 0);
   }
 
   Map<String, dynamic> toJson() => {
@@ -26,6 +26,6 @@ class Option {
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.title}, ${this.subtitle}, ${this.type}, ${this.orderLevel} }';
+    return '{ $id, $title, $subtitle, $type, $orderLevel }';
   }
 }

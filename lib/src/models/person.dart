@@ -3,46 +3,47 @@ import 'package:covid19/src/models/province.dart';
 import 'package:covid19/src/models/status.dart';
 
 class Person {
-  int id;
+  int? id;
   String document;
   String name;
   String lastname;
-  DateTime birthDate;
+  DateTime? birthDate;
   String phone;
   String sex;
   String address;
-  Location location;
-  Status status;
-  Province province;
+  Location? location;
+  Status? status;
+  Province? province;
 
-  Person(
-      {this.id,
-      this.document,
-      this.name,
-      this.lastname,
-      this.birthDate,
-      this.phone,
-      this.sex,
-      this.address,
-      this.location,
-      this.status,
-      this.province});
+  Person({
+    this.id,
+    required this.document,
+    required this.name,
+    required this.lastname,
+    this.birthDate,
+    required this.phone,
+    required this.sex,
+    required this.address,
+    this.location,
+    this.status,
+    this.province,
+  });
 
   factory Person.fromJson(dynamic json) {
     return Person(
-        id: json['id'] as int,
-        document: json['document'] as String,
-        name: json['name'] as String,
-        lastname: json['lastname'] as String,
+        id: json['id'] as int?,
+        document: json['document'] as String? ?? '',
+        name: json['name'] as String? ?? '',
+        lastname: json['lastname'] as String? ?? '',
         birthDate: json['birthDate'] == null
             ? null
             : DateTime.parse(json['birthDate'].toString()),
-        phone: json['phone'] as String,
-        sex: json['sex'] as String,
-        address: json['address'] as String,
-        location: Location.fromJson(json['location']),
-        status: Status.fromJson(json['status']),
-        province: Province.fromJson(json['province']));
+        phone: json['phone'] as String? ?? '',
+        sex: json['sex'] as String? ?? '',
+        address: json['address'] as String? ?? '',
+        location: json['location'] != null ? Location.fromJson(json['location']) : null,
+        status: json['status'] != null ? Status.fromJson(json['status']) : null,
+        province: json['province'] != null ? Province.fromJson(json['province']) : null);
   }
 
   Map<String, dynamic> toJson() => {
@@ -50,17 +51,17 @@ class Person {
         'document': document,
         'name': name,
         'lastname': lastname,
-        'birthDate': birthDate == null ? null : birthDate.toIso8601String(),
+        'birthDate': birthDate?.toIso8601String(),
         'phone': phone,
         'sex': sex,
         'address': address,
-        'location': location.toJson(),
-        'status': status.toJson(),
-        'province': province.toJson()
+        'location': location?.toJson(),
+        'status': status?.toJson(),
+        'province': province?.toJson()
       };
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.document}, ${this.name}, ${this.lastname}, ${this.birthDate}, ${this.phone}, ${this.sex}, ${this.address}, ${this.location}, ${this.status}, ${this.province} }';
+    return '{ $id, $document, $name, $lastname, $birthDate, $phone, $sex, $address, $location, $status, $province }';
   }
 }

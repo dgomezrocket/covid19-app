@@ -11,16 +11,13 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  // single approch way
-  // final bloc = new FormBloc();
   bool _load = false;
-
-  Widget loadingIndicator;
+  Widget? loadingIndicator;
 
   @override
   Widget build(BuildContext context) {
     final FormBloc formBloc = Provider.of(context);
-    loadingIndicator = !_load ? new Container() : createLoader();
+    loadingIndicator = !_load ? Container() : createLoader();
 
     return Scaffold(
       body: Stack(
@@ -49,8 +46,8 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
           Align(
-            child: loadingIndicator,
             alignment: FractionalOffset.center,
+            child: loadingIndicator,
           ),
         ],
       ),
@@ -66,7 +63,7 @@ class _SignupScreenState extends State<SignupScreen> {
             decoration: InputDecoration(
               hintText: 'correo@ejemplo.com',
               labelText: 'Correo',
-              errorText: snapshot.error,
+              errorText: snapshot.error?.toString(),
             ),
             onChanged: bloc.changeEmail,
           );
@@ -84,7 +81,7 @@ class _SignupScreenState extends State<SignupScreen> {
             decoration: InputDecoration(
               hintText: '',
               labelText: 'Contraseña',
-              errorText: snapshot.error,
+              errorText: snapshot.error?.toString(),
             ),
           );
         });
@@ -96,33 +93,31 @@ class _SignupScreenState extends State<SignupScreen> {
         builder: (context, snapshot) {
           return Padding(
             padding: const EdgeInsets.all(20.0),
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () {
                 if (snapshot.hasError) {
-                  return null;
+                  return;
                 }
                 _register(bloc, context);
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                elevation: 10,
+              ),
               child: const Icon(Icons.arrow_forward),
-              color: Colors.amber,
-              clipBehavior: Clip.hardEdge,
-              elevation: 10,
-              disabledColor: Colors.blueGrey,
-              disabledElevation: 10,
-              disabledTextColor: Colors.white,
             ),
           );
         });
   }
 
-  _register(FormBloc bloc, BuildContext context) async {
+  Future<void> _register(FormBloc bloc, BuildContext context) async {
     _showCircularProgressIndicator(true);
     Map<String, dynamic> result = await bloc.register(context);
     _showCircularProgressIndicator(false);
     bloc.treatRegisterRestult(result, context);
   }
 
-  _showCircularProgressIndicator(bool value) {
+  void _showCircularProgressIndicator(bool value) {
     setState(() {
       _load = value;
     });

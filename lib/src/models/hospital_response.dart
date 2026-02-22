@@ -7,34 +7,28 @@ class HospitalResponse {
   Person person;
   List<Hospital> hospitals;
 
-  HospitalResponse({this.person, this.hospitals});
+  HospitalResponse({required this.person, required this.hospitals});
 
   factory HospitalResponse.fromJson(dynamic json) {
+    List<Hospital> hospitals = [];
     if (json['hospitals'] != null) {
       var hospitalsObjsJson = json['hospitals'] as List;
-
-      List<Hospital> _hospitals = hospitalsObjsJson
+      hospitals = hospitalsObjsJson
           .map((hospital) => Hospital.fromJson(hospital))
           .toList();
+    }
 
-      return HospitalResponse(
-          person: Person.fromJson(json['person']), hospitals: _hospitals);
-    } else
-      return HospitalResponse(person: Person.fromJson(json['person']));
+    return HospitalResponse(
+        person: Person.fromJson(json['person']), hospitals: hospitals);
   }
 
-  Map<String, dynamic> toJson() {
-    if (this.hospitals != null)
-      return {
+  Map<String, dynamic> toJson() => {
         'person': person.toJson(),
         'hospitals': hospitals.map((hospital) => hospital.toJson()).toList()
       };
-    else
-      return {'person': person.toJson()};
-  }
 
   @override
   String toString() {
-    return '{ ${this.person}, ${this.hospitals} }';
+    return '{ $person, $hospitals }';
   }
 }

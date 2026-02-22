@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class MessageBox extends StatefulWidget {
-  List<MessageItem> messages;
+  final List<MessageItem> messages;
 
-  MessageBox({this.messages});
+  MessageBox({required this.messages});
 
   @override
   _MessageBoxState createState() => _MessageBoxState();
@@ -15,7 +15,7 @@ class MessageBox extends StatefulWidget {
 
 class _MessageBoxState extends State<MessageBox> {
   final _dateFormat = DateFormat(dateFormatWithHourString);
-  List<Widget> messageBoxes;
+  late List<Widget> messageBoxes;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,9 @@ class _MessageBoxState extends State<MessageBox> {
           Row(
             children: [
               Text(
-                '${_dateFormat.format(message.messageDate)}',
+                message.messageDate != null 
+                    ? _dateFormat.format(message.messageDate!)
+                    : '',
                 style: title_bold_style,
               ),
               Expanded(

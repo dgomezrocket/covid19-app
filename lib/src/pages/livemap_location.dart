@@ -5,81 +5,99 @@ import 'package:covid19/src/utils/styles_options.dart';
 import 'package:covid19/src/utils/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class LiveMap extends StatefulWidget {
-  Location location;
+  final Location? location;
   LiveMap({this.location});
   @override
   _LiveMapState createState() => _LiveMapState();
 }
 
 class _LiveMapState extends State<LiveMap> {
-  Future<Position> _lastKnownPositionFetched;
+  Future<Position>? _lastKnownPositionFetched;
   Position _position = Position(
-      latitude: -25.2819, longitude: -57.635); // Asuncion location by default
-  Position _finalResult;
-  LatLng _latLngPosition;
+      latitude: -25.2819,
+      longitude: -57.635,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0);
+  Position? _finalResult;
+  late LatLng _latLngPosition;
 
   double _mapZoom = 15.0;
 
-  Widget _bodyMap;
+  Widget? _bodyMap;
 
-  LocationPermission _permission;
+  LocationPermission? _permission;
   int _amountOfRequestPermission = 2;
 
   bool _load = false;
-  Widget _loadingIndicator;
+  Widget? _loadingIndicator;
 
   MapController _mapController = MapController();
 
   @override
   void initState() {
+    super.initState();
+    _latLngPosition = LatLng(_position.latitude, _position.longitude);
     _lastKnownPositionFetched = _loadDefaultPosition();
     _bodyMap = _createMap();
-    return super.initState();
   }
 
   Future<Position> _loadDefaultPosition() async {
     if (widget.location != null) {
       _position = Position(
-          latitude: widget.location.latitude,
-          longitude: widget.location.longitude);
-    } else
-      _loadPosition(0, true);
+          latitude: widget.location!.latitude,
+          longitude: widget.location!.longitude,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          heading: 0,
+          speed: 0,
+          speedAccuracy: 0,
+          altitudeAccuracy: 0,
+          headingAccuracy: 0);
+    } else {
+      await _loadPosition(0, true);
+    }
     _latLngPosition = LatLng(_position.latitude, _position.longitude);
     return _position;
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadingIndicator = !_load ? new Container() : createLoader();
-    return FutureBuilder(
+    _loadingIndicator = !_load ? Container() : createLoader();
+    return FutureBuilder<Position>(
       future: _lastKnownPositionFetched,
-      initialData: null,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return createCircularProgressIndicator();
-        else {
-          _loadData(snapshot.data);
+        } else {
+          if (snapshot.data != null) {
+            _loadData(snapshot.data!);
+          }
 
           return Scaffold(
             appBar: AppBar(title: Text("Mi domicilio")),
             body: Stack(
               children: <Widget>[
-                _bodyMap,
+                _bodyMap ?? Container(),
                 Align(
-                  child: _loadingIndicator,
                   alignment: FractionalOffset.center,
+                  child: _loadingIndicator,
                 ),
               ],
             ),
             floatingActionButton: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(
-                  width: 30.0,
-                ),
+                SizedBox(width: 30.0),
                 FloatingActionButton(
                   heroTag: 'getPosition',
                   child: Icon(Icons.location_searching),
@@ -87,9 +105,7 @@ class _LiveMapState extends State<LiveMap> {
                     _setCurrentPosition();
                   },
                 ),
-                Expanded(
-                  child: SizedBox(width: 5.0),
-                ),
+                Expanded(child: SizedBox(width: 5.0)),
                 FloatingActionButton(
                   heroTag: 'returnPosition',
                   child: Icon(Icons.add_location),
@@ -105,51 +121,49 @@ class _LiveMapState extends State<LiveMap> {
     );
   }
 
-  _loadData(dynamic data) {
-    if (data != null) _position = cast<Position>(data);
+  void _loadData(Position data) {
+    _position = data;
     _latLngPosition = LatLng(_position.latitude, _position.longitude);
   }
 
-  _createMap() {
+  Widget _createMap() {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
-        center: _latLngPosition,
-        zoom: _mapZoom,
+        initialCenter: _latLngPosition,
+        initialZoom: _mapZoom,
       ),
-      layers: _createMarkerForPosition(),
+      children: _createMarkerForPosition(),
     );
   }
 
-  List<LayerOptions> _createMarkerForPosition() {
-    List<LayerOptions> layers = [];
+  List<Widget> _createMarkerForPosition() {
+    List<Widget> layers = [];
 
-    TileLayerOptions tileLayerOptions = TileLayerOptions(
+    layers.add(TileLayer(
       urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      subdomains: ['a', 'b', 'c'],
-    );
+      subdomains: const ['a', 'b', 'c'],
+    ));
 
-    layers..add(tileLayerOptions)..add(_createMarker());
+    layers.add(_createMarker());
 
     return layers;
   }
 
-  _createMarker() {
-    return MarkerLayerOptions(
+  Widget _createMarker() {
+    return MarkerLayer(
       markers: [
         Marker(
           width: 200.0,
           height: 200.0,
           point: LatLng(_position.latitude, _position.longitude),
-          builder: (ctx) => Container(
-            child: Icon(Icons.accessibility),
-          ),
+          child: Icon(Icons.accessibility),
         ),
       ],
     );
   }
 
-  _setCurrentPosition() async {
+  Future<void> _setCurrentPosition() async {
     _showCircularProgressIndicator(true);
     await _loadPosition(0, false);
     _latLngPosition = LatLng(_position.latitude, _position.longitude);
@@ -161,21 +175,22 @@ class _LiveMapState extends State<LiveMap> {
     _showCircularProgressIndicator(false);
   }
 
-  _returnLocationToProfile() {
-    if (_finalResult == null)
+  void _returnLocationToProfile() {
+    if (_finalResult == null) {
       Navigator.pop(context, _position);
-    else
+    } else {
       Navigator.pop(context, _finalResult);
+    }
   }
 
-  Future<dynamic> _loadPosition(int timesRequest, bool lastKnown) async {
-    Position tmp = await _getCurrentLocation(timesRequest, lastKnown);
+  Future<void> _loadPosition(int timesRequest, bool lastKnown) async {
+    Position? tmp = await _getCurrentLocation(timesRequest, lastKnown);
     if (tmp != null) {
       _position = tmp;
     }
   }
 
-  Future<Position> _getCurrentLocation(int timesRequest, bool lastKnown) async {
+  Future<Position?> _getCurrentLocation(int timesRequest, bool lastKnown) async {
     _permission = await Geolocator.checkPermission();
     if (_amountOfRequestPermission >= timesRequest) {
       if (_permission == LocationPermission.whileInUse ||
@@ -188,14 +203,16 @@ class _LiveMapState extends State<LiveMap> {
           return _getCurrentLocation(timesRequest + 1, lastKnown);
         }
 
-        if (lastKnown)
+        if (lastKnown) {
           return Geolocator.getLastKnownPosition();
-        else
+        } else {
           return Geolocator.getCurrentPosition(
               desiredAccuracy: LocationAccuracy.high);
+        }
       } else {
-        if (_amountOfRequestPermission > timesRequest)
+        if (_amountOfRequestPermission > timesRequest) {
           _permission = await Geolocator.requestPermission();
+        }
         return _getCurrentLocation(timesRequest + 1, lastKnown);
       }
     } else {
@@ -204,7 +221,7 @@ class _LiveMapState extends State<LiveMap> {
     }
   }
 
-  Future<dynamic> _launchAlert(String message) async {
+  Future<void> _launchAlert(String message) async {
     await showDialog(
         context: context,
         barrierDismissible: false,
@@ -215,14 +232,11 @@ class _LiveMapState extends State<LiveMap> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  message,
-                  locale: localES,
-                ),
+                Text(message, locale: localES),
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
@@ -233,7 +247,7 @@ class _LiveMapState extends State<LiveMap> {
         });
   }
 
-  _showCircularProgressIndicator(bool value) {
+  void _showCircularProgressIndicator(bool value) {
     setState(() {
       _load = value;
     });

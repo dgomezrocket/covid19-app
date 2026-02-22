@@ -8,11 +8,10 @@ import 'package:rxdart/rxdart.dart';
 import 'package:covid19/src/mixins/validation_mixin.dart';
 
 class FormBloc with ValidationMixin {
-  final _email = new BehaviorSubject<String>();
-  final _password = new BehaviorSubject<String>();
-  final _errorMessage = new BehaviorSubject<String>();
+  final _email = BehaviorSubject<String>();
+  final _password = BehaviorSubject<String>();
+  final _errorMessage = BehaviorSubject<String?>();
 
-  // getters: Changers
   Function(String) get changeEmail {
     addError(null);
     return _email.sink.add;
@@ -23,11 +22,11 @@ class FormBloc with ValidationMixin {
     return _password.sink.add;
   }
 
-  Function(String) get addError => _errorMessage.sink.add;
-  // getters: Add stream
+  Function(String?) get addError => _errorMessage.sink.add;
+
   Stream<String> get email => _email.stream.transform(validatorEmail);
   Stream<String> get password => _password.stream.transform(validatorPassword);
-  Stream<String> get errorMessage => _errorMessage.stream;
+  Stream<String?> get errorMessage => _errorMessage.stream;
 
   Stream<bool> get submitValidForm => Rx.combineLatest3(
         email,
@@ -36,8 +35,6 @@ class FormBloc with ValidationMixin {
         (e, p, er) => true,
       );
 
-  //var authInfo;
-  // rgister
   Future<Map<String, dynamic>> register(BuildContext context) async {
     final authInfo = AuthService();
 
@@ -46,7 +43,7 @@ class FormBloc with ValidationMixin {
     return data;
   }
 
-  treatRegisterRestult(
+  void treatRegisterRestult(
       Map<String, dynamic> result, BuildContext context) async {
     if (result['status'] != null) {
       await Future.delayed(Duration(milliseconds: 100));
@@ -57,7 +54,6 @@ class FormBloc with ValidationMixin {
     }
   }
 
-  // login
   Future<Map<String, dynamic>> login(BuildContext context) async {
     final authInfo = AuthService();
 
@@ -67,7 +63,7 @@ class FormBloc with ValidationMixin {
     return data;
   }
 
-  treatLoginResult(Map<String, dynamic> result, BuildContext context) async {
+  void treatLoginResult(Map<String, dynamic> result, BuildContext context) async {
     if (result['status'] != null) {
       await Future.delayed(Duration(milliseconds: 100));
       addError(result['message']);
@@ -78,8 +74,7 @@ class FormBloc with ValidationMixin {
     }
   }
 
-  // close streams
-  dispose() {
+  void dispose() {
     _email.close();
     _password.close();
     _errorMessage.close();

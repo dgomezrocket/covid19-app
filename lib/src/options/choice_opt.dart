@@ -7,15 +7,15 @@ class ChoiceOption extends StatefulWidget {
   List<Option> children;
   int value = 0;
 
-  ChoiceOption({this.children});
+  ChoiceOption({required this.children});
 
   @override
   _ChoiceOptionState createState() => _ChoiceOptionState();
 }
 
 class _ChoiceOptionState extends State<ChoiceOption> {
-  void _onRememberMeChanged(int newValue) => setState(() {
-        widget.value = newValue;
+  void _onRememberMeChanged(int? newValue) => setState(() {
+        widget.value = newValue ?? 0;
       });
 
   @override
@@ -26,8 +26,8 @@ class _ChoiceOptionState extends State<ChoiceOption> {
   Widget createRadioOption(Option choiceItem) {
     return Column(children: [
       ListTile(
-        leading: Radio(
-          value: choiceItem.id,
+        leading: Radio<int>(
+          value: choiceItem.id ?? 0,
           groupValue: widget.value,
           onChanged: _onRememberMeChanged,
         ),

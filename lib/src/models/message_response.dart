@@ -1,40 +1,32 @@
 import 'package:covid19/src/models/message_item.dart';
-
 import 'package:covid19/src/models/person.dart';
 
 class MessageResponse {
   List<MessageItem> messages;
   Person myData;
 
-  MessageResponse({this.messages, this.myData});
+  MessageResponse({required this.messages, required this.myData});
 
   factory MessageResponse.fromJson(dynamic json) {
+    List<MessageItem> messages = [];
     if (json['messages'] != null) {
       var messageItemsObjsJson = json['messages'] as List;
-
-      List<MessageItem> _messageItems = messageItemsObjsJson
+      messages = messageItemsObjsJson
           .map((messageItem) => MessageItem.fromJson(messageItem))
           .toList();
+    }
 
-      return MessageResponse(
-          messages: _messageItems, myData: Person.fromJson(json['myData']));
-    } else
-      return MessageResponse(myData: Person.fromJson(json['myData']));
+    return MessageResponse(
+        messages: messages, myData: Person.fromJson(json['myData']));
   }
 
-  Map<String, dynamic> toJson() {
-    if (this.messages != null)
-      return {
-        'messages':
-            messages.map((messageItem) => messageItem.toJson()).toList(),
+  Map<String, dynamic> toJson() => {
+        'messages': messages.map((messageItem) => messageItem.toJson()).toList(),
         'myData': myData.toJson()
       };
-    else
-      return {'myData': myData.toJson()};
-  }
 
   @override
   String toString() {
-    return '{ ${this.messages} }';
+    return '{ $messages }';
   }
 }

@@ -4,18 +4,18 @@ import 'package:covid19/src/models/item.dart';
 import 'package:covid19/src/utils/styles_options.dart';
 
 class CheckOption extends StatefulWidget {
-  Item item;
+  final Item item;
   bool value;
 
-  CheckOption({this.item, this.value});
+  CheckOption({required this.item, required this.value});
 
   @override
   _CheckOptionState createState() => _CheckOptionState();
 }
 
 class _CheckOptionState extends State<CheckOption> {
-  void _onRememberMeChanged(bool newValue) => setState(() {
-        widget.value = newValue;
+  void _onRememberMeChanged(bool? newValue) => setState(() {
+        widget.value = newValue ?? false;
       });
 
   @override

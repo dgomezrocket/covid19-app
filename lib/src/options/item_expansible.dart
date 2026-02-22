@@ -9,7 +9,7 @@ class ItemInputExpansible extends StatefulWidget {
   String value;
   bool check;
 
-  ItemInputExpansible({this.item, this.value, this.check});
+  ItemInputExpansible({required this.item, this.value = '', this.check = false});
 
   @override
   _ItemInputExpansibleState createState() => _ItemInputExpansibleState();
@@ -33,6 +33,7 @@ class _ItemInputExpansibleState extends State<ItemInputExpansible> {
           title: ListTile(
             leading: Checkbox(
               value: widget.check,
+              onChanged: (value) {},
             ),
             title: Text(
               widget.item.title,

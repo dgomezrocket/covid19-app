@@ -4,12 +4,12 @@ import 'package:covid19/src/models/item.dart';
 import 'package:covid19/src/options/check_opt.dart';
 
 class ItemWithOption extends StatefulWidget {
-  String title;
-  String description;
-  bool check;
-  List<Widget> children;
+  final String? title;
+  final String? description;
+  final bool? check;
+  final List<Widget> children;
 
-  ItemWithOption({this.title, this.description, this.check, this.children});
+  ItemWithOption({this.title, this.description, this.check, required this.children});
 
   @override
   _ItemWithOptionState createState() => _ItemWithOptionState();
@@ -23,8 +23,8 @@ class _ItemWithOptionState extends State<ItemWithOption> {
       Container(
         child: ExpansionTile(
           title: CheckOption(
-            item: Item(title: widget.title, subtitle: widget.description),
-            value: widget.check,
+            item: Item(title: widget.title ?? '', subtitle: widget.description ?? ''),
+            value: widget.check ?? false,
           ),
           children: widget.children,
         ),

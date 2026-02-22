@@ -3,35 +3,35 @@ import 'dart:convert';
 import 'package:covid19/src/models/item.dart';
 
 class FormPerson {
-  int id;
+  int? id;
   String title;
   String subtitle;
   int orderLevel;
   List<Item> itemsForm;
 
-  FormPerson(
-      {this.id, this.title, this.subtitle, this.orderLevel, this.itemsForm});
+  FormPerson({
+    this.id,
+    required this.title,
+    required this.subtitle,
+    required this.orderLevel,
+    required this.itemsForm,
+  });
 
   factory FormPerson.fromJson(dynamic json) {
+    List<Item> itemsForm = [];
     if (json['itemsForm'] != null) {
       var itemsFormObjsJson = json['itemsForm'] as List;
-
-      List<Item> _itemsForm = itemsFormObjsJson
+      itemsForm = itemsFormObjsJson
           .map((itemFormJson) => Item.fromJson(itemFormJson))
           .toList();
+    }
 
-      return FormPerson(
-          id: json['id'] as int,
-          title: json['title'] as String,
-          subtitle: json['subtitle'] as String,
-          orderLevel: json['orderLevel'] as int,
-          itemsForm: _itemsForm);
-    } else
-      return FormPerson(
-          id: json['id'] as int,
-          title: json['title'] as String,
-          subtitle: json['subtitle'] as String,
-          orderLevel: json['orderLevel'] as int);
+    return FormPerson(
+        id: json['id'] as int?,
+        title: json['title'] as String? ?? '',
+        subtitle: json['subtitle'] as String? ?? '',
+        orderLevel: json['orderLevel'] as int? ?? 0,
+        itemsForm: itemsForm);
   }
 
   Map<String, dynamic> toJson() => {
@@ -43,6 +43,6 @@ class FormPerson {
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.title}, ${this.subtitle}, ${this.orderLevel}, ${this.itemsForm} }';
+    return '{ $id, $title, $subtitle, $orderLevel, $itemsForm }';
   }
 }

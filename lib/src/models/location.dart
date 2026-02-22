@@ -1,18 +1,15 @@
 class Location {
-  int id;
+  int? id;
   double latitude;
   double longitude;
 
-  Location({this.id, this.latitude, this.longitude});
+  Location({this.id, required this.latitude, required this.longitude});
 
   factory Location.fromJson(dynamic json) {
-    if (json != null)
-      return Location(
-          id: json['id'] as int,
-          latitude: json['latitude'] as double,
-          longitude: json['longitude'] as double);
-    else
-      return null;
+    return Location(
+        id: json['id'] as int?,
+        latitude: (json['latitude'] as num).toDouble(),
+        longitude: (json['longitude'] as num).toDouble());
   }
 
   Map<String, dynamic> toJson() =>
@@ -20,6 +17,6 @@ class Location {
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.latitude}, ${this.longitude} }';
+    return '{ $id, $latitude, $longitude }';
   }
 }

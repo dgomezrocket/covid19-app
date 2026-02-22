@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 class AnswerExpansible extends StatefulWidget {
   final List<Answer> answers;
 
-  AnswerExpansible({this.answers});
+  AnswerExpansible({required this.answers});
 
   @override
   _AnswerExpansibleState createState() => _AnswerExpansibleState();
@@ -17,13 +17,13 @@ class AnswerExpansible extends StatefulWidget {
 
 class _AnswerExpansibleState extends State<AnswerExpansible> {
   final dateFormat = DateFormat(dateFormatWithHourString);
-  List<Widget> answersWidgets;
-  List<Widget> itemsAnsweredWidgets;
+  late List<Widget> answersWidgets;
+  late List<Widget> itemsAnsweredWidgets;
 
   @override
   void initState() {
+    super.initState();
     answersWidgets = widget.answers.map(_createAnswer).toList();
-    return super.initState();
   }
 
   @override
@@ -48,7 +48,9 @@ class _AnswerExpansibleState extends State<AnswerExpansible> {
                   children: [
                     TextSpan(text: '${answer.form.title} con fecha '),
                     TextSpan(
-                        text: '${dateFormat.format(answer.answerDate)}',
+                        text: answer.answerDate != null 
+                            ? dateFormat.format(answer.answerDate!)
+                            : 'Sin fecha',
                         style: title_bold_style),
                   ],
                 ),
@@ -93,10 +95,11 @@ class _AnswerExpansibleState extends State<AnswerExpansible> {
     );
   }
 
-  String _createItemAnswerText(String text) {
-    if (text != null)
+  String _createItemAnswerText(String? text) {
+    if (text != null) {
       return text;
-    else
+    } else {
       return 'Sin respuesta';
+    }
   }
 }
