@@ -80,16 +80,26 @@ class _FormPageState extends State<FormPage> {
   }
 
   Widget _createSaveButton(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton(
-          child: Text('Guardar'),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: Size(double.infinity, 50),
+          ),
           onPressed: () {
             _showConfirmation(context);
           },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.save),
+              SizedBox(width: 8),
+              Text('Guardar', style: TextStyle(fontSize: 16)),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 
@@ -156,9 +166,11 @@ class _FormPageState extends State<FormPage> {
     widget.items?.forEach((item) {
       CheckOption? checkOption = cast<CheckOption>(item);
       ItemInputExpansible? itemInputExpansible = cast<ItemInputExpansible>(item);
-      
+
       if (checkOption != null && checkOption.value) {
-        answer.answers.add(ItemsAnswer(item: checkOption.item));
+        answer.answers.add(ItemsAnswer(
+            answerText: 'Sí', // Texto que indica que fue seleccionado
+            item: checkOption.item));
       } else if (itemInputExpansible != null && itemInputExpansible.check) {
         answer.answers.add(ItemsAnswer(
             answerText: itemInputExpansible.value,

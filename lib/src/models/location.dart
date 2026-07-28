@@ -12,8 +12,16 @@ class Location {
         longitude: (json['longitude'] as num).toDouble());
   }
 
-  Map<String, dynamic> toJson() =>
-      {'id': id, 'latitude': latitude, 'longitude': longitude};
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+    if (id != null) {
+      map['id'] = id;
+    }
+    return map;
+  }
 
   @override
   String toString() {

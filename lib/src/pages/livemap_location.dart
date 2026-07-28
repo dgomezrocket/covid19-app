@@ -141,8 +141,8 @@ class _LiveMapState extends State<LiveMap> {
     List<Widget> layers = [];
 
     layers.add(TileLayer(
-      urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      subdomains: const ['a', 'b', 'c'],
+      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      userAgentPackageName: 'com.example.covid19',
     ));
 
     layers.add(_createMarker());
